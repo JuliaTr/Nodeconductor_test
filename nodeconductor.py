@@ -58,8 +58,6 @@ class NodeconductorTest(unittest.TestCase):
         else:
             print 'I found some element, test fails.'
 
-        
-
     def tearDown(self):
         # close browser
         self.driver.quit()
