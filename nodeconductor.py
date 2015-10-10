@@ -2,7 +2,9 @@ import time
 import unittest
 from selenium import webdriver
 
-from helpers import login_nodeconductor, get_driver, create_new_project, deletion_created_project, create_ssh_key
+from helpers import (login_nodeconductor, get_driver, create_new_project, 
+                    deletion_created_project, create_ssh_key)
+
 
 class NodeconductorTest(unittest.TestCase):
 
