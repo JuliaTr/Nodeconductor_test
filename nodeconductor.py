@@ -1,31 +1,33 @@
 import time
 import unittest
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
-from helpers import login_nodeconductor, get_driver, create_new_project, deletion_created_project, create_ssh_key
+import settings
+from helpers import (login_nodeconductor, get_driver, create_new_project, 
+                    deletion_created_project, create_ssh_key, delete_ssh_key)
+
 
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
         # Open browser
-        self.driver = get_driver()
+        self.driver = get_driver(settings.site_url)
  
     def test_login_nodeconductor(self):
-        login_nodeconductor(self.driver)
+        login_nodeconductor(self.driver, settings.username, settings.password)
         # Identify necessary username on loaded main page
         username_idt_field = self.driver.find_element_by_class_name('user-name')
-        assert username_idt_field.text == 'Trygubniak', 'Warning'
+        assert username_idt_field.text == settings.user_full_name, 'Warning'
 
     def test_create_new_project(self):
-        login_nodeconductor(self.driver)
+        login_nodeconductor(self.driver, settings.username, settings.password)
         create_new_project(self.driver, 'Julia_project', 'xcvgngbfr')
         # Identify created project
         project_name_field = self.driver.find_element_by_class_name('name')
         assert project_name_field.text == 'Julia_project', 'Warning'
         deletion_created_project(self.driver)
         # Check deletion
-        project_search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
-        project_search_field.send_keys('Julia_project')
         time.sleep(5)
         list_of_projects_field = self.driver.find_element_by_class_name('object-list')
 
@@ -38,12 +40,10 @@ class NodeconductorTest(unittest.TestCase):
 
     def test_create_ssh_key(self):
         # Create ssh key
-        login_nodeconductor(self.driver)
+        login_nodeconductor(self.driver, settings.username, settings.password)
         create_ssh_key(self.driver)
         delete_ssh_key(self.driver)
         # Check deletion
-        ssh_search_field = self.driver.find_element_by_css_selector('[ng-model="UserDetailUpdate.searchInput"]')
-        ssh_search_field.send_keys('vgbh')
         time.sleep(5)
         list_of_keys_field = self.driver.find_element_by_css_selector('html.ng-scope body.ng-scope.block-ui.'
             'block-ui-anim-fade div.app-wrap.ng-scope div.ng-scope div.ng-scope div.ng-scope div.profile'
