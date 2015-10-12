@@ -2,15 +2,15 @@ import time
 
 from selenium import webdriver
 
-def get_driver():
+def get_driver(site_url):
     # Open browser
     driver = webdriver.Firefox()
     driver.maximize_window()
     # Go to start page
-    driver.get("http://squ-test.nodeconductor.com")
+    driver.get(site_url)
     return driver
 
-def login_nodeconductor(driver):
+def login_nodeconductor(driver, username, password):
     # Click on take a tour button
     element = driver.find_element_by_class_name('take-a-tour')
     element.click()
@@ -45,6 +45,9 @@ def deletion_created_project(driver):
     # Delete created project
     back_to_list_field = driver.find_element_by_class_name('back-to-list')
     back_to_list_field.click()
+    time.sleep(5)
+    project_search_field = driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+    project_search_field.send_keys('Julia_project')
     time.sleep(5)
     actions_field = driver.find_element_by_link_text('actions')
     actions_field.click()
@@ -88,19 +91,4 @@ def delete_ssh_key(driver):
     # Confirm deletion
     alert = driver.switch_to_alert()
     alert.accept()
-    # Check deletion
-    ssh_search_field = driver.find_element_by_css_selector('[ng-model="UserDetailUpdate.searchInput"]')
-    ssh_search_field.send_keys('vgbh')
-    time.sleep(5)
-    list_of_keys_field = driver.find_element_by_css_selector('html.ng-scope body.ng-scope.block-ui.'
-        'block-ui-anim-fade div.app-wrap.ng-scope div.ng-scope div.ng-scope div.ng-scope div.profile'
-        '-content.ng-scope div.container div.tabs-wrapper div.tab-content div#keys.tab.ng-scope.ng-isolate'
-        '-scope.tab-active div.ng-scope div.ng-scope entitylist.ng-isolate-scope div.ng-scope div.ng-scope '
-        'div.table')
 
-    try:
-        list_of_keys_field.find_element_by_tag_name('span')
-    except NoSuchElementException:
-        print 'I cannot find element. This is good.'
-    else:
-        print 'I found some element, test fails.'
