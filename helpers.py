@@ -6,10 +6,6 @@ from selenium import webdriver
 #     driver.execute_script("window.scrollTo(0, 50);")
 #     time.sleep(5)
 
-# def page_reload(driver):
-#     driver.refresh()
-#     time.sleep(10)
-
 def get_driver(site_url):
     # Open browser
     driver = webdriver.Firefox()
@@ -33,10 +29,8 @@ def login_nodeconductor(driver, username, password):
     # Click to login
     login_field = driver.find_element_by_class_name('button-login')
     login_field.click()
-    # Necessary time for reloading page
-    time.sleep(5)
 
-def choose_definite_organization(driver, nec_organization):
+def choose_organization(driver, nec_organization):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
     organization = driver.find_element_by_link_text(nec_organization)
@@ -44,12 +38,10 @@ def choose_definite_organization(driver, nec_organization):
     time.sleep(5)
     dashboard_field = driver.find_element_by_link_text('Dashboard')
     dashboard_field.click()
-    time.sleep(5)
 
-def create_new_project(driver, project_name, project_description=''):
+def create_project(driver, project_name, project_description=''):
     # Create new project by clicking on the button
     add_new_project_field = driver.find_element_by_class_name('button-apply')
-    # [ui-sref="projects.create"]'
     add_new_project_field.click()
     time.sleep(5)
     project_name_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.name"]')
@@ -61,9 +53,8 @@ def create_new_project(driver, project_name, project_description=''):
     time.sleep(5)
     dashboard_field = driver.find_element_by_link_text('Dashboard')
     dashboard_field.click()
-    time.sleep(5)
 
-def deletion_created_project(driver, project_name):
+def delete_project(driver, project_name):
     dashboard_field = driver.find_element_by_link_text('Dashboard')
     dashboard_field.click()
     time.sleep(5)
@@ -84,7 +75,6 @@ def deletion_created_project(driver, project_name):
     # Confirm deletion
     alert = driver.switch_to_alert()
     alert.accept()
-    time.sleep(5)
 
 def create_ssh_key(driver, user_full_name, key_name):
     user_field = driver.find_element_by_link_text(user_full_name)
@@ -107,7 +97,6 @@ def create_ssh_key(driver, user_full_name, key_name):
     time.sleep(5)
     add_key_field = driver.find_element_by_class_name('button-apply')
     add_key_field.click()
-    time.sleep(5)
 
 def delete_ssh_key(driver, key_name, user_full_name):    
     dashboard_field = driver.find_element_by_link_text('Dashboard')
@@ -127,14 +116,13 @@ def delete_ssh_key(driver, key_name, user_full_name):
     # Confirm deletion
     alert = driver.switch_to_alert()
     alert.accept()
-    time.sleep(5)
 
-def create_resource(driver, project_name, resource_name, time_wait):
+def create_resource(driver, project_name, resource_name, time_after_resource_creation):
     dashboard_field = driver.find_element_by_link_text('Dashboard')
     dashboard_field.click()
     time.sleep(5)
-    projects = driver.find_element_by_link_text(project_name)
-    projects.click()
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
     # organization = driver.find_element_by_link_text('Manage projects')
     # organization.click()
     # time.sleep(5)
@@ -144,8 +132,8 @@ def create_resource(driver, project_name, resource_name, time_wait):
     # project = driver.find_element_by_link_text(project_name)
     # project.click()
     time.sleep(5)
-    resource_vms = driver.find_element_by_css_selector('[visible="vms"]')
-    resource_vms.click()
+    vms = driver.find_element_by_css_selector('[visible="vms"]')
+    vms.click()
     time.sleep(5)
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
@@ -156,8 +144,8 @@ def create_resource(driver, project_name, resource_name, time_wait):
     provider = driver.find_element_by_class_name('openstack')
     provider.click()
     time.sleep(5)
-    resource_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
-    resource_field.send_keys(resource_name)
+    resource_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
+    resource_name_field.send_keys(resource_name)
     time.sleep(5)
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
@@ -179,10 +167,11 @@ def create_resource(driver, project_name, resource_name, time_wait):
     time.sleep(5)
     purchase = driver.find_element_by_css_selector('[ng-click="AppStore.save()"]')
     purchase.click()
-    time.sleep(time_wait)
+    time.sleep(time_after_resource_creation)
     driver.refresh()
 
-def delete_resource(driver, resource_name, project_name, time_wait_again, time_wait_remove):
+def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping, 
+                    time_wait_after_resource_removal):
     dashboard_field = driver.find_element_by_link_text('Dashboard')
     dashboard_field.click()
     time.sleep(5)
@@ -192,18 +181,18 @@ def delete_resource(driver, resource_name, project_name, time_wait_again, time_w
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
     time.sleep(5)
-    resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_field.send_keys(resource_name)
+    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    resource_search_field.send_keys(resource_name)
     time.sleep(5)
     resource_list = driver.find_elements_by_class_name('list-box')
     for resource in resource_list:
-        assert 'Online' in resource.text, 'Warning'
+        assert 'Online' in resource.text, 'Error: cannot stop resource that is not online or does not exist'
     time.sleep(5)
     actions = driver.find_element_by_link_text('actions')
     actions.click()
     stop_field = driver.find_element_by_link_text('Stop')
     stop_field.click()
-    time.sleep(time_wait_again)
+    time.sleep(time_wait_after_resource_stopping)
     driver.refresh()
     time.sleep(5)
     vms = driver.find_element_by_css_selector('[visible="vms"]')
@@ -214,7 +203,8 @@ def delete_resource(driver, resource_name, project_name, time_wait_again, time_w
     time.sleep(5)
     resource_list = driver.find_elements_by_class_name('list-box')
     for state in resource_list:
-        assert 'Offline' in state.text, 'Warning'
+        assert 'Offline' in state.text, ('Error: cannot delete resource that is not offline, '
+                                        'was not stopped, or does not exist')
     time.sleep(5)
     actions = driver.find_element_by_link_text('actions')
     actions.click()
@@ -222,7 +212,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_again, time_w
     remove_field.click()
     alert = driver.switch_to_alert()
     alert.accept()
-    time.sleep(time_wait_remove)
+    time.sleep(time_wait_after_resource_removal)
     driver.refresh()
     time.sleep(5)
     vms = driver.find_element_by_css_selector('[visible="vms"]')
@@ -233,8 +223,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_again, time_w
     time.sleep(5)
     resource_list = driver.find_elements_by_class_name('list-box')
     for resource in resource_list:
-        assert resource_name not in resource.text, 'Warning'
-    time.sleep(5)
+        assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
 
 
 

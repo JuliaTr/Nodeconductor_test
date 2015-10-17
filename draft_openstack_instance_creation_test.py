@@ -4,9 +4,9 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 import settings
-from helpers import (login_nodeconductor, get_driver, create_new_project, 
-                    deletion_created_project, create_ssh_key, delete_ssh_key, 
-                    choose_definite_organization, create_resource, delete_resource)
+from helpers import (login_nodeconductor, get_driver, create_project, 
+                    delete_project, create_ssh_key, delete_ssh_key, 
+                    choose_organization, create_resource, delete_resource)
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -23,9 +23,9 @@ class NodeconductorTest(unittest.TestCase):
 
     def test_create_new_project(self):
         login_nodeconductor(self.driver, settings.username, settings.password)
-        time.sleep(5)
-        choose_definite_organization(self.driver, settings.nec_organization)
-        create_new_project(self.driver, settings.project_name)
+        time.sleep(10)
+        choose_organization(self.driver, settings.nec_organization)
+        create_project(self.driver, settings.project_name)
         
     def test_create_ssh_key(self):
         # Create ssh key
@@ -34,26 +34,26 @@ class NodeconductorTest(unittest.TestCase):
     
     def test_create_resource(self):
         login_nodeconductor(self.driver, settings.username, settings.password)
-        time.sleep(5)
-        choose_definite_organization(self.driver, settings.nec_organization)
+        time.sleep(10)
+        choose_organization(self.driver, settings.nec_organization)
         create_resource(self.driver, settings.project_name, settings.resource_name,settings.time_wait)
 
     def test_delete_resource(self):
         login_nodeconductor(self.driver, settings.username, settings.password)
-        time.sleep(5)
-        choose_definite_organization(self.driver, settings.nec_organization)
+        time.sleep(10)
+        choose_organization(self.driver, settings.nec_organization)
         create_resource(self.driver, settings.project_name, settings.resource_name, settings.time_wait)
         delete_resource(self.driver, settings.resource_name, settings.project_name, settings.time_wait_again, 
                         settings.time_wait_remove)
 
     def test_delete_new_project(self):
         login_nodeconductor(self.driver, settings.username, settings.password)
-        time.sleep(5)
-        choose_definite_organization(self.driver, settings.nec_organization)
+        time.sleep(10)
+        choose_organization(self.driver, settings.nec_organization)
         # create_new_project(self.driver, settings.project_name)
-        deletion_created_project(self.driver, settings.project_name)
+        delete_project(self.driver, settings.project_name)
         # Check deletion
-        time.sleep(5)
+        time.sleep(10)
         list_of_projects_field = self.driver.find_element_by_class_name('object-list')
 
         try:
@@ -65,10 +65,10 @@ class NodeconductorTest(unittest.TestCase):
 
     def test_delete_ssh_key(self):
         login_nodeconductor(self.driver, settings.username, settings.password)
-        time.sleep(5)
+        time.sleep(10)
         delete_ssh_key(self.driver, settings.key_name, settings.user_full_name)
         # Check deletion
-        time.sleep(5)
+        time.sleep(10)
         list_of_keys_field = self.driver.find_element_by_css_selector('html.ng-scope body.ng-scope.block-ui.'
             'block-ui-anim-fade div.app-wrap.ng-scope div.ng-scope div.ng-scope div.ng-scope div.profile'
             '-content.ng-scope div.container div.tabs-wrapper div.tab-content div#keys.tab.ng-scope.ng-isolate'
