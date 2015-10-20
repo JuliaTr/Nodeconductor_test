@@ -46,8 +46,9 @@ def create_project(driver, project_name, project_description=''):
     time.sleep(5)
     project_name_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.name"]')
     project_name_field.send_keys(project_name)
-    # project_description_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.description"]')
-    # project_description_field.send_keys(project_description)
+    if project_description:
+        project_description_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.description"]')
+        project_description_field.send_keys(project_description)
     create_project_field = driver.find_element_by_class_name('button-apply')
     create_project_field.click()
     time.sleep(5)
@@ -225,8 +226,93 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     for resource in resource_list:
         assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
 
+def create_provider(driver, project_name, provider_name):
+    dashboard_field = driver.find_element_by_link_text('Dashboard')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    providers = driver.find_element_by_css_selector('[visible="providers"]')
+    providers.click()
+    time.sleep(5)
+    # provider_creation = driver.find_element_by_link_text('Create provider')
+    # provider_creation.click()
+    # time.sleep(5)
+    # provider_type = driver.find_element_by_class_name('digitalocean')
+    # provider_type.click()
+    # time.sleep(5)
+    # provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
+    # provider_name_field.clear()
+    # provider_name_field.send_keys(provider_name)
+    # token_name_field = driver.find_element_by_id('DigitalOcean_token')
+    # token_name_field.send_keys('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
+    # add_provider_button = driver.find_element_by_link_text('Add provider')
+    # add_provider_button.click()
+    
+def import_resource(driver, project_name, provider_name, resource_name):
+    dashboard_field = driver.find_element_by_link_text('Dashboard')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    vms = driver.find_element_by_css_selector('[visible="vms"]')
+    vms.click()
+    time.sleep(5)
+    resource_import = driver.find_element_by_link_text('Import')
+    resource_import.click()
+    time.sleep(5)
+    category_list = driver.find_elements_by_class_name('appstore-template')
+    for category in category_list:
+        if category.text == 'VMs':
+            category.click()
+            break
+    time.sleep(5)
+    provider_list = driver.find_elements_by_class_name('appstore-template')
+    for provider in provider_list:
+        if provider.text == provider_name:
+            provider.click()
+            break
+    time.sleep(5)
+    resource = driver.find_element_by_link_text(resource_name)
+    resource.click()
+    import_button = driver.find_element_by_link_text('Import')
+    import_button.click()
 
+def unlink_resource(driver, project_name, resource_name):
+    dashboard_field = driver.find_element_by_link_text('Dashboard')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    vms = driver.find_element_by_css_selector('[visible="vms"]')
+    vms.click()
+    time.sleep(5)
+    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    resource_search_field.send_keys(resource_name)
+    time.sleep(5)
+    actions = driver.find_element_by_link_text('actions')
+    actions.click()
+    unlink_field = driver.find_element_by_link_text('Unlink')
+    unlink_field.click()
 
-
-
-
+def delete_provider(driver, project_name, provider_name):
+    dashboard_field = driver.find_element_by_link_text('Dashboard')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    providers = driver.find_element_by_css_selector('[visible="providers"]')
+    providers.click()
+    time.sleep(5)
+    provider_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    provider_search_field.send_keys(provider_name)
+    time.sleep(5)
+    remove_provider = driver.find_element_by_link_text('Remove')
+    remove_provider.click()
+    # Confirm deletion
+    alert = driver.switch_to_alert()
+    alert.accept()
