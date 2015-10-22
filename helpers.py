@@ -109,7 +109,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
     profile_field.click()
     time.sleep(5)
     # Delete ssh key
-    ssh_search_field = driver.find_element_by_css_selector('[ng-model="UserDetailUpdate.searchInput"]')
+    ssh_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     ssh_search_field.send_keys(key_name)
     time.sleep(5)
     ssh_key_remove_field = driver.find_element_by_link_text('Remove')
