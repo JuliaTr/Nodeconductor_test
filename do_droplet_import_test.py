@@ -3,7 +3,6 @@ import unittest
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
-import settings
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, create_ssh_key, 
                     delete_ssh_key, choose_organization, create_resource, delete_resource, create_provider, 
                     import_resource, unlink_resource, delete_provider)
