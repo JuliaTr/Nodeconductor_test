@@ -3,9 +3,9 @@ import unittest
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
-from helpers import (login_nodeconductor, get_driver, create_project, delete_project, create_ssh_key, 
-                    delete_ssh_key, choose_organization, create_resource, delete_resource, create_provider, 
-                    import_resource, unlink_resource, delete_provider)
+from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
+                    create_provider, import_resource, unlink_resource, delete_provider, is_in_list, 
+                    element_exists)
 
 
 class Settings(object):
@@ -27,11 +27,10 @@ class NodeconductorTest(unittest.TestCase):
         self.provider_exists = False
         self.resource_exists = False
 
-    def test_create_delete_project_key_resource(self):
+    def test_create_delete_project_resource(self):
         print '%s is going to be loggedin.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
         time.sleep(10)
-        # Identify necessary username on loaded main page
         username_idt_field = self.driver.find_element_by_class_name('user-name')
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
         time.sleep(10)
@@ -44,90 +43,97 @@ class NodeconductorTest(unittest.TestCase):
         
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
-        time.sleep(10)
+        time.sleep(5)
+        search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+        search_field.clear()
+        time.sleep(5)
+        search_field.send_keys(Settings.project_name)
+        time.sleep(5)
+        projects_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
+        assert is_in_list(projects_list, Settings.project_name), (
+            'Error: Cannot find project with name  %s ' % Settings.project_name)
         self.project_exists = True
         print 'Project was created successfully'
+        time.sleep(10)
         
         print 'Provider is going to be created.'
         create_provider(self.driver, Settings.project_name, Settings.provider_name)
-        self.provider_exists = True
-        # time.sleep(10)        
-        # try:
-        #     self.driver.find_element_by_link_text(Settings.provider_name)
-        # except NoSuchElementException:
-        #     print 'I cannot find created provider, test fails.'
-        # else:
-        #     print 'Created provider is found. This is good.'  
+        time.sleep(5)
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        search_field.clear()
+        time.sleep(5)
+        search_field.send_keys(Settings.provider_name)
+        time.sleep(5)
+        provider_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
+        assert is_in_list(provider_list, Settings.provider_name), (
+            'Error: Cannot find provider with name  %s ' % Settings.provider_name)
+        self.provider_exists = True  
         print 'Provider was created successfully.'
         time.sleep(10)
         
         print 'Resource is going to be imported.'
         import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.resource_name)
+        time.sleep(10)
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        search_field.clear()
+        time.sleep(5)
+        search_field.send_keys(Settings.resource_name)
+        time.sleep(5)
+        resource_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
+        assert is_in_list(resource_list, Settings.resource_name), (
+            'Error: Cannot find resource with name  %s ' % Settings.resource_name)
         self.resource_exists = True
-        # time.sleep(10)
-        # try:
-        #     self.driver.find_element_by_link_text(Settings.resource_name)
-        # except NoSuchElementException:
-        #     print 'I cannot find imported resource, test fails.'
-        # else:
-        #     print 'Imported resource is found. This is good.'
         print 'Resource was imported successfully.'
         time.sleep(10)
         
         print 'Resource is going to be unlinked.'
         unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
         time.sleep(10)
-        # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        # search_field.clear()
-        # search_field.send_keys(Settings.resource_name)
-        # time.sleep(5)
-        # try:
-        #     self.driver.find_element_by_link_text(Settings.resource_name)
-        # except NoSuchElementException:
-        #     print 'I cannot find unlinked resource. This is good.'
-        # else:
-        #     print 'Unlinked resource is found, test fails.'
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        search_field.clear()
+        time.sleep(5)
+        search_field.send_keys(Settings.resource_name)
+        time.sleep(10)
+        assert not element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
+            'Error: Resource with name %s is found' % Settings.resource_name)
         self.resource_exists = False
         print 'Resource was unlinked successfully.'
-       
+        time.sleep(10)
+
     def tearDown(self):
         print 'Provider exists: ', self.provider_exists
         if self.provider_exists:
             try:
                 print 'Provider is going to be removed.'
-                time.sleep(10)
-                self.driver.refresh()       
+                time.sleep(10)       
                 delete_provider(self.driver, Settings.project_name, Settings.provider_name)
                 self.provider_exists = False
                 time.sleep(10)
-                # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                # search_field.clear()
-                # search_field.send_keys(Settings.provider_name)
-                # time.sleep(5)
-                # try:
-                #     self.driver.find_element_by_link_text(Settings.provider_name)
-                # except NoSuchElementException:
-                #     print 'I cannot find removed provider. This is good.'
-                # else:
-                #     print 'Removed provider is found, test fails.'
+                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+                search_field.clear()
+                time.sleep(5)
+                search_field.send_keys(Settings.provider_name)
+                time.sleep(5)
+                assert not element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
+                    'Error: Provider with name %s is found' % Settings.provider_name)
             except Exception as e:
                 print 'Provider cannot be removed. Error: %s' % e
+        time.sleep(10)
         
         if self.project_exists:
             try:
                 print 'Project is going to be removed.'
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
-                # Check deletion
-                # time.sleep(10)
-                # list_of_projects_field = self.driver.find_element_by_class_name('object-list')
-
-                # try:
-                #     list_of_projects_field.find_element_by_link_text(Settings.project_name)
-                # except NoSuchElementException:
-                #     print 'I cannot find project. This is good.'
-                # else:
-                #     print 'Project is found, test fails.'
+                time.sleep(10)
+                if not element_exists(self.driver, xpath="//*[contains(text(), 'You have no projects yet.')]"):
+                    search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+                    search_field.clear()
+                    time.sleep(5)
+                    search_field.send_keys(Settings.project_name)
+                    time.sleep(10)
+                    if element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'):
+                        self.project_exists = True
             except Exception as e:
                 print 'Project cannot be deleted. Error: %s' % e       
         
@@ -138,7 +144,6 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
 
-        # # close browser
         # self.driver.quit()
 
 
