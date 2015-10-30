@@ -3,15 +3,13 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
-# def page_scroll(driver):
-#     driver.execute_script("window.scrollTo(0, 50);")
-#     time.sleep(5)
 
 def is_in_list(list_element, text):
     for element in list_element:
         if text in element.text:
             return True
     return False
+
 
 def element_exists(driver, css_selector=None, link_text=None, xpath=None):
     try:
@@ -26,11 +24,13 @@ def element_exists(driver, css_selector=None, link_text=None, xpath=None):
     else:
         return True
 
+
 def get_driver(site_url):
     driver = webdriver.Firefox()
     driver.maximize_window()
     driver.get(site_url)
     return driver
+
 
 def login_nodeconductor(driver, username, password):
     element = driver.find_element_by_class_name('take-a-tour')
@@ -43,6 +43,7 @@ def login_nodeconductor(driver, username, password):
     login_field = driver.find_element_by_class_name('button-login')
     login_field.click()
 
+
 def choose_organization(driver, nec_organization):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
@@ -51,6 +52,7 @@ def choose_organization(driver, nec_organization):
     time.sleep(10)
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
+
 
 def create_project(driver, project_name, project_description=''):
     add_new_project_field = driver.find_element_by_class_name('button-apply')
@@ -66,6 +68,7 @@ def create_project(driver, project_name, project_description=''):
     time.sleep(10)
     back_to_list_field = driver.find_element_by_class_name('back-to-list')
     back_to_list_field.click()
+
 
 def delete_project(driver, project_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
@@ -87,6 +90,7 @@ def delete_project(driver, project_name):
     time.sleep(5)
     alert = driver.switch_to_alert()
     alert.accept()
+
 
 def create_ssh_key(driver, user_full_name, key_name):
     user_field = driver.find_element_by_link_text(user_full_name)
@@ -110,6 +114,7 @@ def create_ssh_key(driver, user_full_name, key_name):
     add_key_field = driver.find_element_by_class_name('button-apply')
     add_key_field.click()
 
+
 def delete_ssh_key(driver, key_name, user_full_name):    
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -127,6 +132,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
     time.sleep(8)
     alert = driver.switch_to_alert()
     alert.accept()
+
 
 def create_resource(driver, project_name, resource_name, category_name, provider_name, image_name, 
                     flavor_name, public_key_name):
@@ -177,6 +183,7 @@ def create_resource(driver, project_name, resource_name, category_name, provider
     time.sleep(5)
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
+
 
 def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping, 
                     time_wait_after_resource_removal):
@@ -233,6 +240,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     for resource in resource_list:
         assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
 
+
 def create_provider(driver, project_name, provider_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -256,7 +264,8 @@ def create_provider(driver, project_name, provider_name):
     token_name_field.send_keys('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
-    
+ 
+
 def import_resource(driver, project_name, provider_name, resource_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -288,6 +297,7 @@ def import_resource(driver, project_name, provider_name, resource_name):
     import_button = driver.find_element_by_link_text('Import')
     import_button.click()
 
+
 def unlink_resource(driver, project_name, resource_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -305,6 +315,7 @@ def unlink_resource(driver, project_name, resource_name):
     actions.click()
     unlink_field = driver.find_element_by_link_text('Unlink')
     unlink_field.click()
+
 
 def delete_provider(driver, project_name, provider_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')

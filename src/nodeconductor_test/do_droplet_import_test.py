@@ -144,7 +144,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
 
-        # self.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":

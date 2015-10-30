@@ -1,4 +1,3 @@
 .sublime
-example.py
-node_scripts.py
+.tmp
 *.pyc
