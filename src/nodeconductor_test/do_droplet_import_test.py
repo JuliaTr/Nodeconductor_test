@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                    create_provider, import_resource, unlink_resource, delete_provider, is_in_list, 
+                    create_provider, import_resource, unlink_resource, delete_provider, is_in_list,
                     element_exists)
 
 
@@ -35,12 +35,12 @@ class NodeconductorTest(unittest.TestCase):
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
         time.sleep(10)
         print '%s was loggedin successfully.' % Settings.username
-        
+
         print 'Organization is going to be chosen.'
         choose_organization(self.driver, Settings.nec_organization)
         time.sleep(10)
         print 'Organization was chosen successfully.'
-        
+
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(5)
@@ -55,7 +55,7 @@ class NodeconductorTest(unittest.TestCase):
         self.project_exists = True
         print 'Project was created successfully'
         time.sleep(10)
-        
+
         print 'Provider is going to be created.'
         create_provider(self.driver, Settings.project_name, Settings.provider_name)
         time.sleep(5)
@@ -67,10 +67,10 @@ class NodeconductorTest(unittest.TestCase):
         provider_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
         assert is_in_list(provider_list, Settings.provider_name), (
             'Error: Cannot find provider with name  %s ' % Settings.provider_name)
-        self.provider_exists = True  
+        self.provider_exists = True
         print 'Provider was created successfully.'
         time.sleep(10)
-        
+
         print 'Resource is going to be imported.'
         import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.resource_name)
         time.sleep(10)
@@ -85,7 +85,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = True
         print 'Resource was imported successfully.'
         time.sleep(10)
-        
+
         print 'Resource is going to be unlinked.'
         unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
         time.sleep(10)
@@ -105,7 +105,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.provider_exists:
             try:
                 print 'Provider is going to be removed.'
-                time.sleep(10)       
+                time.sleep(10)
                 delete_provider(self.driver, Settings.project_name, Settings.provider_name)
                 self.provider_exists = False
                 time.sleep(10)
@@ -119,7 +119,7 @@ class NodeconductorTest(unittest.TestCase):
             except Exception as e:
                 print 'Provider cannot be removed. Error: %s' % e
         time.sleep(10)
-        
+
         if self.project_exists:
             try:
                 print 'Project is going to be removed.'
@@ -135,8 +135,8 @@ class NodeconductorTest(unittest.TestCase):
                     if element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'):
                         self.project_exists = True
             except Exception as e:
-                print 'Project cannot be deleted. Error: %s' % e       
-        
+                print 'Project cannot be deleted. Error: %s' % e
+
         if self.resource_exists:
             print 'Warning! Test cannot unlink resource %s. It has to be unlinked manually.' % Settings.resource_name
         if self.provider_exists:
