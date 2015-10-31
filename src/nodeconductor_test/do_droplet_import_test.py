@@ -1,11 +1,9 @@
 import time
 import unittest
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                    create_provider, import_resource, unlink_resource, delete_provider, is_in_list,
-                    element_exists)
+                     create_provider, import_resource, unlink_resource, delete_provider, is_in_list,
+                     element_exists)
 
 
 class Settings(object):
