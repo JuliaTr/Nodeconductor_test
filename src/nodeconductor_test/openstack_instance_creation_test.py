@@ -1,3 +1,15 @@
+"""
+1. Login NC
+2. Choose organization
+3. Create project
+4. Create ssh key
+5. Create resource
+6. Delete resource
+7. Remove project
+8. Delete ssh key
+"""
+
+
 import time
 import unittest
 
