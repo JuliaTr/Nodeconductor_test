@@ -115,7 +115,7 @@ def create_ssh_key(driver, user_full_name, key_name):
     add_key_field.click()
 
 
-def delete_ssh_key(driver, key_name, user_full_name):    
+def delete_ssh_key(driver, key_name, user_full_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
     time.sleep(5)
@@ -134,7 +134,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
     alert.accept()
 
 
-def create_resource(driver, project_name, resource_name, category_name, provider_name, image_name, 
+def create_resource(driver, project_name, resource_name, category_name, provider_name, image_name,
                     flavor_name, public_key_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -168,7 +168,7 @@ def create_resource(driver, project_name, resource_name, category_name, provider
         if image.text == image_name:
             image.click()
             break
-    time.sleep(5)        
+    time.sleep(5)
     flavors = driver.find_elements_by_class_name('title')
     for flavor in flavors:
         if flavor.text == flavor_name:
@@ -179,13 +179,13 @@ def create_resource(driver, project_name, resource_name, category_name, provider
     for public_key in public_keys:
         if public_key.text == public_key_name:
             public_key.click()
-            break  
+            break
     time.sleep(5)
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
 
 
-def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping, 
+def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping,
                     time_wait_after_resource_removal):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
@@ -219,7 +219,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     resource_list = driver.find_elements_by_class_name('list-box')
     for state in resource_list:
         assert 'Offline' in state.text, ('Error: cannot delete resource that is not offline, '
-                                        'was not stopped, or does not exist')
+                                         'was not stopped, or does not exist')
     time.sleep(5)
     actions = driver.find_element_by_link_text('actions')
     actions.click()
@@ -264,7 +264,7 @@ def create_provider(driver, project_name, provider_name):
     token_name_field.send_keys('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
- 
+
 
 def import_resource(driver, project_name, provider_name, resource_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')

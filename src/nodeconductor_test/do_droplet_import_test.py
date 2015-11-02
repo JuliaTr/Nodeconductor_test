@@ -26,6 +26,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
 
     def test_create_delete_project_resource(self):
+        # Login NC
         print '%s is going to be loggedin.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
         time.sleep(10)
@@ -34,11 +35,13 @@ class NodeconductorTest(unittest.TestCase):
         time.sleep(10)
         print '%s was loggedin successfully.' % Settings.username
 
+        # Choose organization
         print 'Organization is going to be chosen.'
         choose_organization(self.driver, Settings.nec_organization)
         time.sleep(10)
         print 'Organization was chosen successfully.'
 
+        # Create project
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(5)
@@ -54,6 +57,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project was created successfully'
         time.sleep(10)
 
+        # Create provider
         print 'Provider is going to be created.'
         create_provider(self.driver, Settings.project_name, Settings.provider_name)
         time.sleep(5)
@@ -69,6 +73,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider was created successfully.'
         time.sleep(10)
 
+        # Import resource
         print 'Resource is going to be imported.'
         import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.resource_name)
         time.sleep(10)
@@ -84,6 +89,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Resource was imported successfully.'
         time.sleep(10)
 
+        # Unlink resource
         print 'Resource is going to be unlinked.'
         unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
         time.sleep(10)
@@ -102,6 +108,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider exists: ', self.provider_exists
         if self.provider_exists:
             try:
+                # Remove provider
                 print 'Provider is going to be removed.'
                 time.sleep(10)
                 delete_provider(self.driver, Settings.project_name, Settings.provider_name)
@@ -120,6 +127,7 @@ class NodeconductorTest(unittest.TestCase):
 
         if self.project_exists:
             try:
+                # Remove project
                 print 'Project is going to be removed.'
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
@@ -142,7 +150,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
 
-        self.driver.quit()
+        # self.driver.quit()
 
 
 if __name__ == "__main__":
