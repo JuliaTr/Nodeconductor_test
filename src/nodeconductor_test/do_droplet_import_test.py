@@ -1,3 +1,15 @@
+"""
+1. Login NC
+2. Choose organization
+3. Create project
+4. Create provider
+5. Import resource
+6. Unlink resource
+7. Remove provider
+8. Remove project
+"""
+
+
 import time
 import unittest
 
