@@ -241,13 +241,13 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
 
 
-def create_provider(driver, project_name, provider_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(8)
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+def create_provider(driver, provider_name):
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
     time.sleep(5)
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(10)
     providers = driver.find_element_by_css_selector('[visible="providers"]')
     providers.click()
     time.sleep(5)
@@ -317,20 +317,20 @@ def unlink_resource(driver, project_name, resource_name):
     unlink_field.click()
 
 
-def delete_provider(driver, project_name, provider_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
+def delete_provider(driver, provider_name):
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
     time.sleep(5)
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
-    time.sleep(5)
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(10)
     providers = driver.find_element_by_css_selector('[visible="providers"]')
     providers.click()
     time.sleep(5)
     provider_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     provider_search_field.send_keys(provider_name)
     time.sleep(10)
-    remove_provider = driver.find_element_by_link_text('Remove')
+    remove_provider = driver.find_element_by_link_text('Delete')
     remove_provider.click()
     time.sleep(5)
     alert = driver.switch_to_alert()
