@@ -24,7 +24,7 @@ class Settings(object):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     nec_organization = 'Ministry of Bells'
-    project_name = 'OpenStack test project'
+    project_name = 'OpenStack test project2'
     key_name = 'Openstack test key'
     category_name = 'VMs'
     provider_name = 'TEO cloud'
@@ -163,7 +163,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.ssh_key_exists:
             print 'Warning! Test cannot delete ssh key %s. It has to be deleted manually.' % Settings.key_name
 
-        # self.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":
