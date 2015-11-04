@@ -57,7 +57,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(5)
-        search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()
         time.sleep(5)
         search_field.send_keys(Settings.project_name)

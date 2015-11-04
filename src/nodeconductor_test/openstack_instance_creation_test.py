@@ -65,7 +65,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(5)
-        search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()
         time.sleep(5)
         search_field.send_keys(Settings.project_name)
@@ -128,7 +128,7 @@ class NodeconductorTest(unittest.TestCase):
                 self.project_exists = False
                 time.sleep(10)
                 if not element_exists(self.driver, xpath="//*[contains(text(), 'You have no projects yet.')]"):
-                    search_field = self.driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+                    search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
                     search_field.clear()
                     time.sleep(5)
                     search_field.send_keys(Settings.project_name)
