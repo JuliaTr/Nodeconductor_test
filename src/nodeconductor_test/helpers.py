@@ -80,7 +80,7 @@ def delete_project(driver, project_name):
     back_to_list_field = driver.find_element_by_class_name('back-to-list')
     back_to_list_field.click()
     time.sleep(5)
-    project_search_field = driver.find_element_by_css_selector('[ng-model="entityList.searchInput"]')
+    project_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     project_search_field.send_keys(project_name)
     time.sleep(5)
     actions_field = driver.find_element_by_link_text('actions')
