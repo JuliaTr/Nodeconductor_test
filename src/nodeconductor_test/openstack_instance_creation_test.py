@@ -5,7 +5,7 @@
 4. Create ssh key
 5. Create resource
 6. Delete resource
-7. Remove project
+7. Delete project
 8. Delete ssh key
 """
 
@@ -122,8 +122,8 @@ class NodeconductorTest(unittest.TestCase):
     def tearDown(self):
         if self.project_exists:
             try:
-                # Remove project
-                print 'Project is going to be removed.'
+                # Delete project
+                print 'Project is going to be deleted.'
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 time.sleep(10)

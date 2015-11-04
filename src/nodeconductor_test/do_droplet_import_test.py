@@ -5,8 +5,8 @@
 4. Create provider
 5. Import resource
 6. Unlink resource
-7. Remove provider
-8. Remove project
+7. Delete provider
+8. Delete project
 """
 
 
@@ -71,7 +71,7 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
-        create_provider(self.driver, Settings.project_name, Settings.provider_name)
+        create_provider(self.driver, Settings.provider_name)
         time.sleep(5)
         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()
@@ -120,10 +120,10 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider exists: ', self.provider_exists
         if self.provider_exists:
             try:
-                # Remove provider
-                print 'Provider is going to be removed.'
+                # Delete provider
+                print 'Provider is going to be deleted.'
                 time.sleep(10)
-                delete_provider(self.driver, Settings.project_name, Settings.provider_name)
+                delete_provider(self.driver, Settings.provider_name)
                 self.provider_exists = False
                 time.sleep(10)
                 search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
@@ -134,13 +134,13 @@ class NodeconductorTest(unittest.TestCase):
                 assert not element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
                     'Error: Provider with name %s is found' % Settings.provider_name)
             except Exception as e:
-                print 'Provider cannot be removed. Error: %s' % e
+                print 'Provider cannot be deleted. Error: %s' % e
         time.sleep(10)
 
         if self.project_exists:
             try:
-                # Remove project
-                print 'Project is going to be removed.'
+                # Delete project
+                print 'Project is going to be deleted.'
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 time.sleep(10)
