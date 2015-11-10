@@ -27,6 +27,7 @@ class Settings(object):
     project_name = 'DO test project'
     provider_name = 'DigitalOceanTest'
     resource_name = 'FFW3'
+    projected_cost = 'Projected cost $5.00'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -100,6 +101,15 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = True
         print 'Resource was imported successfully.'
         time.sleep(10)
+
+        dashboard_field = self.driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+        dashboard_field.click()
+        time.sleep(10)
+        costs = self.driver.find_element_by_link_text('Costs')
+        costs.click()
+        time.sleep(20)
+        assert Settings.projected_cost == self.driver.find_element_by_class_name('total-cost').text, (
+            'Error: Cannot find %s ' % Settings.projected_cost)
 
         # Unlink resource
         print 'Resource is going to be unlinked.'

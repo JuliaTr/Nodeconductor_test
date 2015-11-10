@@ -267,7 +267,8 @@ def create_provider(driver, provider_name):
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
     token_name_field = driver.find_element_by_id('DigitalOcean_token')
-    token_name_field.send_keys('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
+    token_name_field.send_keys('6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710')
+    # ('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
 
