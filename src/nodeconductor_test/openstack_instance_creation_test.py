@@ -14,7 +14,7 @@ import time
 import unittest
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, create_ssh_key,
-                     delete_ssh_key, choose_organization, create_resource, delete_resource, is_in_list,
+                     delete_ssh_key, choose_organization, create_resource_openstack, delete_resource, is_in_list,
                      element_exists)
 
 
@@ -24,10 +24,10 @@ class Settings(object):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     nec_organization = 'Ministry of Bells'
-    project_name = 'OpenStack test project2'
+    project_name = 'OpenStack test project3'
     key_name = 'Openstack test key'
     category_name = 'VMs'
-    provider_name = 'TEO cloud'
+    provider_name_in_resource = 'Parnu LAB'
     image_name = 'Ubuntu 14.04 x86_64'
     flavor_name = 'm1.small'
     resource_name = 'OpenStack test instance'
@@ -96,8 +96,8 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create resource
         print 'Resource is going to be created.'
-        create_resource(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
-                        Settings.provider_name, Settings.image_name, Settings.flavor_name, Settings.public_key_name)
+        create_resource_openstack(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
+                        Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name, Settings.public_key_name)
         time.sleep(Settings.time_after_resource_creation)
         self.driver.refresh()
         time.sleep(10)
@@ -163,7 +163,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.ssh_key_exists:
             print 'Warning! Test cannot delete ssh key %s. It has to be deleted manually.' % Settings.key_name
 
-        self.driver.quit()
+        # self.driver.quit()
 
 
 if __name__ == "__main__":

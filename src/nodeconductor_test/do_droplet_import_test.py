@@ -14,7 +14,7 @@ import time
 import unittest
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider, import_resource, unlink_resource, delete_provider, is_in_list,
+                     create_provider_digitalocean, import_resource, unlink_resource, delete_provider, is_in_list,
                      element_exists)
 
 
@@ -25,7 +25,9 @@ class Settings(object):
     user_full_name = 'Alice Lebowski'
     nec_organization = 'Ministry of Bells'
     project_name = 'DO test project'
+    provider_type_name = 'digitalocean'
     provider_name = 'DigitalOceanTest'
+    token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
     resource_name = 'FFW3'
     projected_cost = 'Projected cost $5.00'
 
@@ -72,7 +74,7 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
-        create_provider(self.driver, Settings.provider_name)
+        create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name, Settings.token_name)
         time.sleep(5)
         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()
@@ -110,6 +112,7 @@ class NodeconductorTest(unittest.TestCase):
         time.sleep(20)
         assert Settings.projected_cost == self.driver.find_element_by_class_name('total-cost').text, (
             'Error: Cannot find %s ' % Settings.projected_cost)
+        time.sleep(15)
 
         # Unlink resource
         print 'Resource is going to be unlinked.'
