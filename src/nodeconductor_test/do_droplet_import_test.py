@@ -23,7 +23,7 @@ class Settings(object):
     username = 'Alice'
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
-    nec_organization = 'Ministry of Bells'
+    organization = 'Test only org'
     project_name = 'DO test project'
     provider_type_name = 'digitalocean'
     provider_name = 'DigitalOceanTest'
@@ -40,7 +40,7 @@ class NodeconductorTest(unittest.TestCase):
         self.provider_exists = False
         self.resource_exists = False
 
-    def test_create_delete_project_resource(self):
+    def test_create_delete_project_provider_resource(self):
         # Login NC
         print '%s is going to be loggedin.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -52,7 +52,7 @@ class NodeconductorTest(unittest.TestCase):
 
         # Choose organization
         print 'Organization is going to be chosen.'
-        choose_organization(self.driver, Settings.nec_organization)
+        choose_organization(self.driver, Settings.organization)
         time.sleep(10)
         print 'Organization was chosen successfully.'
 

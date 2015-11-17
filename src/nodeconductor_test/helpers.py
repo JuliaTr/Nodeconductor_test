@@ -44,10 +44,10 @@ def login_nodeconductor(driver, username, password):
     login_field.click()
 
 
-def choose_organization(driver, nec_organization):
+def choose_organization(driver, organization):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
-    organization = driver.find_element_by_link_text(nec_organization)
+    organization = driver.find_element_by_link_text(organization)
     organization.click()
     time.sleep(10)
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
@@ -141,7 +141,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
 
 
 def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
-                            image_name, flavor_name, public_key_name):
+                              image_name, flavor_name, public_key_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
     time.sleep(5)
@@ -192,7 +192,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
 
 
 def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
-                        username, os_password, size_name):
+                          username, os_password, size_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
     time.sleep(5)
@@ -330,6 +330,8 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     add_provider_button.click()
 
 
+# Method isn't completed yet.
+# TODO: Add certificate.
 def create_provider_azure(driver, provider_name, provider_type_name, subscription_id_name):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
@@ -354,19 +356,7 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     upload_file = driver.find_element_by_link_text('Browse')
     upload_file.click()
     time.sleep(5)
-    # certificate = driver.switch_to_window('File Upload')
-    certificate = driver.switch_to_active_element()
-    certificate.send_keys('home\julia\azure_cert.pem')
-    certificate.submit()
-    # certificate = driver.find_element_by_name('azure_cert.pem')
-    # certificate.open()
-    # driver.current_window_handle
-    # element = driver.switch_to_window("File Upload")
-    # driver.navigate()
-    # element.send_keys("home\julia\azure_cert.pem")
-    # alert = driver.switch_to_alert()
-    # alert.accept()
-    time.sleep(5)
+    # TODO: Add certificate.
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
 

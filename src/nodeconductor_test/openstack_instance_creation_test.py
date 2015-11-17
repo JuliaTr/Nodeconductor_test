@@ -23,8 +23,8 @@ class Settings(object):
     username = 'Alice'
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
-    nec_organization = 'Ministry of Bells'
-    project_name = 'OpenStack test project3'
+    organization = 'Test only org'
+    project_name = 'OpenStack test project'
     key_name = 'Openstack test key'
     category_name = 'VMs'
     provider_name_in_resource = 'Parnu LAB'
@@ -57,7 +57,7 @@ class NodeconductorTest(unittest.TestCase):
 
         # Choose organization
         print 'Organization is going to be chosen.'
-        choose_organization(self.driver, Settings.nec_organization)
+        choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
         time.sleep(10)
 
