@@ -44,10 +44,10 @@ def login_nodeconductor(driver, username, password):
     login_field.click()
 
 
-def choose_organization(driver, nec_organization):
+def choose_organization(driver, organization):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
-    organization = driver.find_element_by_link_text(nec_organization)
+    organization = driver.find_element_by_link_text(organization)
     organization.click()
     time.sleep(10)
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
@@ -140,8 +140,59 @@ def delete_ssh_key(driver, key_name, user_full_name):
     alert.accept()
 
 
-def create_resource(driver, project_name, resource_name, category_name, provider_name, image_name,
-                    flavor_name, public_key_name):
+def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
+                              image_name, flavor_name, public_key_name):
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    vms = driver.find_element_by_css_selector('[visible="vms"]')
+    vms.click()
+    time.sleep(5)
+    resource_vms_creation = driver.find_element_by_link_text('Create')
+    resource_vms_creation.click()
+    time.sleep(5)
+    categories = driver.find_elements_by_class_name('appstore-template')
+    for category in categories:
+        if category.text == category_name:
+            category.click()
+            break
+    time.sleep(5)
+    providers = driver.find_elements_by_class_name('appstore-template')
+    for provider in providers:
+        if provider.text == provider_name_in_resource:
+            provider.click()
+            break
+    time.sleep(10)
+    resource_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
+    resource_name_field.send_keys(resource_name)
+    time.sleep(5)
+    images = driver.find_elements_by_class_name('appstore-template-image')
+    for image in images:
+        if image.text == image_name:
+            image.click()
+            break
+    time.sleep(5)
+    flavors = driver.find_elements_by_class_name('title')
+    for flavor in flavors:
+        if flavor.text == flavor_name:
+            flavor.click()
+            break
+    time.sleep(5)
+    public_keys = driver.find_elements_by_class_name('description-ssh_public_key')
+    for public_key in public_keys:
+        if public_key.text == public_key_name:
+            public_key.click()
+            break
+    time.sleep(5)
+    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
+    purchase.click()
+
+
+def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
+                          username, os_password, size_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
     time.sleep(5)
@@ -166,25 +217,32 @@ def create_resource(driver, project_name, resource_name, category_name, provider
             provider.click()
             break
     time.sleep(10)
-    resource_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
-    resource_name_field.send_keys(resource_name)
+    resource_os_username_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
+    resource_os_username_field.send_keys(username)
     time.sleep(5)
+    os_password_field = driver.find_element_by_class_name('appstore-password')
+    os_password_field.send_keys(os_password)
+    time.sleep(5)
+    repeat_os_password_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[\'repeat_password\']"]')
+    repeat_os_password_field.send_keys(os_password)
+    time.sleep(5)
+    repeat_os_password_field = driver.find_element_by_id('name')
+    repeat_os_password_field.send_keys(resource_name)
+    time.sleep(5)
+    search_field = driver.find_element_by_css_selector('[ng-model="field.searchQuery"]')
+    time.sleep(5)
+    search_field.send_keys(image_name)
+    time.sleep(10)
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
         if image.text == image_name:
             image.click()
             break
     time.sleep(5)
-    flavors = driver.find_elements_by_class_name('title')
-    for flavor in flavors:
-        if flavor.text == flavor_name:
-            flavor.click()
-            break
-    time.sleep(5)
-    public_keys = driver.find_elements_by_class_name('description-ssh_public_key')
-    for public_key in public_keys:
-        if public_key.text == public_key_name:
-            public_key.click()
+    sizes = driver.find_elements_by_class_name('title')
+    for size in sizes:
+        if size.text == size_name:
+            size.click()
             break
     time.sleep(5)
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
@@ -247,7 +305,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
 
 
-def create_provider(driver, provider_name):
+def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
     time.sleep(5)
@@ -260,15 +318,45 @@ def create_provider(driver, provider_name):
     provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
     time.sleep(5)
-    provider_type = driver.find_element_by_class_name('digitalocean')
+    provider_type = driver.find_element_by_class_name(provider_type_name)
     provider_type.click()
     time.sleep(5)
     provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
     token_name_field = driver.find_element_by_id('DigitalOcean_token')
-    token_name_field.send_keys('6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710')
-    # ('dd7b13dabd7a3579885bba9de6482da15f0a5305dd2c22afc13eadf3e04c8ffe')
+    token_name_field.send_keys(token_name)
+    add_provider_button = driver.find_element_by_link_text('Add provider')
+    add_provider_button.click()
+
+
+# Method isn't completed yet.
+# TODO: Add certificate.
+def create_provider_azure(driver, provider_name, provider_type_name, subscription_id_name):
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    time.sleep(5)
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(10)
+    providers = driver.find_element_by_css_selector('[visible="providers"]')
+    providers.click()
+    time.sleep(5)
+    provider_creation = driver.find_element_by_link_text('Create provider')
+    provider_creation.click()
+    time.sleep(5)
+    provider_type = driver.find_element_by_class_name(provider_type_name)
+    provider_type.click()
+    time.sleep(5)
+    provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
+    provider_name_field.clear()
+    provider_name_field.send_keys(provider_name)
+    token_name_field = driver.find_element_by_id('Azure_username')
+    token_name_field.send_keys(subscription_id_name)
+    upload_file = driver.find_element_by_link_text('Browse')
+    upload_file.click()
+    time.sleep(5)
+    # TODO: Add certificate.
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
 
@@ -308,10 +396,10 @@ def import_resource(driver, project_name, provider_name, resource_name):
 def unlink_resource(driver, project_name, resource_name):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
-    time.sleep(5)
+    time.sleep(10)
     project = driver.find_element_by_link_text(project_name)
     project.click()
-    time.sleep(5)
+    time.sleep(10)
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
     time.sleep(5)
