@@ -394,9 +394,9 @@ def import_resource(driver, project_name, provider_name, resource_name):
 
 
 def unlink_resource(driver, project_name, resource_name):
-    # dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    # dashboard_field.click()
-    # time.sleep(10)
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+    time.sleep(10)
     project = driver.find_element_by_link_text(project_name)
     project.click()
     time.sleep(10)
