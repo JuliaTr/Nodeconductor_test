@@ -97,13 +97,13 @@ def create_ssh_key(driver, user_full_name, key_name):
     user_field.click()
     profile_field = driver.find_element_by_link_text('Profile')
     profile_field.click()
-    time.sleep(5)
+    time.sleep(10)
     keys = driver.find_element_by_css_selector('[visible="keys"]')
     keys.click()
-    time.sleep(5)
+    time.sleep(15)
     keys_field = driver.find_element_by_link_text('Add SSH Key')
     keys_field.click()
-    time.sleep(5)
+    time.sleep(15)
     key_name_field = driver.find_element_by_css_selector('[ng-model="KeyAdd.instance.name"]')
     key_name_field.send_keys(key_name)
     public_key_field = driver.find_element_by_css_selector('[ng-model="KeyAdd.instance.public_key"]')
@@ -302,7 +302,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     time.sleep(5)
     resource_list = driver.find_elements_by_class_name('list-box')
     for resource in resource_list:
-        assert resource_name not in resource.text, 'Error: resource was not deleted resource, it still exist'
+        assert resource_name not in resource.text, 'Error: resource was not deleted, it still exists'
 
 
 def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
@@ -394,9 +394,9 @@ def import_resource(driver, project_name, provider_name, resource_name):
 
 
 def unlink_resource(driver, project_name, resource_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(10)
+    # dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    # dashboard_field.click()
+    # time.sleep(10)
     project = driver.find_element_by_link_text(project_name)
     project.click()
     time.sleep(10)
@@ -430,3 +430,71 @@ def delete_provider(driver, provider_name):
     time.sleep(5)
     alert = driver.switch_to_alert()
     alert.accept()
+
+
+def create_application(driver, project_name, category_name, resource_type_name, path_name, application_name):
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+    time.sleep(15)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(10)
+    vms = driver.find_element_by_css_selector('[visible="applications"]')
+    vms.click()
+    time.sleep(5)
+    provider_creation = driver.find_element_by_link_text('Create')
+    provider_creation.click()
+    time.sleep(5)
+    categories = driver.find_elements_by_class_name('appstore-template')
+    for category in categories:
+        if category.text == category_name:
+            category.click()
+            break
+    time.sleep(5)
+    resource_types = driver.find_elements_by_class_name('appstore-template')
+    for resource_type in resource_types:
+        if resource_type.text == resource_type_name:
+            resource_type.click()
+            break
+    time.sleep(5)
+    path_field = driver.find_element_by_css_selector('[ng-if="field.name !== \'password\'"]')
+    path_field.send_keys(path_name)
+    time.sleep(5)
+    application_name_field = driver.find_element_by_id('name')
+    application_name_field.send_keys(application_name)
+    time.sleep(5)
+    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
+    purchase.click()
+
+
+def delete_application(driver, project_name, time_wait_after_resource_removal, application_name):
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+    time.sleep(5)
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+    time.sleep(5)
+    applications = driver.find_element_by_css_selector('[visible="applications"]')
+    applications.click()
+    time.sleep(5)
+    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    resource_search_field.send_keys(application_name)
+    time.sleep(5)
+    actions = driver.find_element_by_link_text('actions')
+    actions.click()
+    remove_field = driver.find_element_by_link_text('Remove')
+    remove_field.click()
+    alert = driver.switch_to_alert()
+    alert.accept()
+    time.sleep(time_wait_after_resource_removal)
+    driver.refresh()
+    time.sleep(5)
+    applications = driver.find_element_by_css_selector('[visible="applications"]')
+    applications.click()
+    time.sleep(5)
+    resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    resource_field.send_keys(application_name)
+    time.sleep(5)
+    application_list = driver.find_elements_by_class_name('list-box')
+    for application in application_list:
+        assert application_name not in application.text, 'Error: application was not deleted, it still exists'

@@ -37,6 +37,7 @@ class Settings(object):
     time_wait_after_resource_removal = 30
 
 
+# IMPORTANT: It's impossible to test resource deletion.
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
@@ -97,7 +98,8 @@ class NodeconductorTest(unittest.TestCase):
         # Create resource
         print 'Resource is going to be created.'
         create_resource_openstack(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
-                        Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name, Settings.public_key_name)
+                                  Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name,
+                                  Settings.public_key_name)
         time.sleep(Settings.time_after_resource_creation)
         self.driver.refresh()
         time.sleep(10)

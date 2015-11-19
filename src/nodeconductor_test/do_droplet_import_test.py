@@ -26,7 +26,7 @@ class Settings(object):
     organization = 'Test only org'
     project_name = 'DO test project'
     provider_type_name = 'digitalocean'
-    provider_name = 'DigitalOceanTest'
+    provider_name = 'DigitalOceanTest provider'
     token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
     resource_name = 'FFW3'
     projected_cost = 'Projected cost $5.00'
@@ -101,6 +101,7 @@ class NodeconductorTest(unittest.TestCase):
         assert is_in_list(resource_list, Settings.resource_name), (
             'Error: Cannot find resource with name  %s ' % Settings.resource_name)
         self.resource_exists = True
+        print 'Resource exists: ', self.resource_exists
         print 'Resource was imported successfully.'
         time.sleep(10)
 
@@ -109,10 +110,13 @@ class NodeconductorTest(unittest.TestCase):
         time.sleep(10)
         costs = self.driver.find_element_by_link_text('Costs')
         costs.click()
-        time.sleep(20)
+        time.sleep(10)
         assert Settings.projected_cost == self.driver.find_element_by_class_name('total-cost').text, (
             'Error: Cannot find %s ' % Settings.projected_cost)
-        time.sleep(15)
+        time.sleep(10)
+        activity = self.driver.find_element_by_link_text('Activity')
+        activity.click()
+        time.sleep(10)
 
         # Unlink resource
         print 'Resource is going to be unlinked.'
@@ -126,6 +130,7 @@ class NodeconductorTest(unittest.TestCase):
         assert not element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
             'Error: Resource with name %s is found' % Settings.resource_name)
         self.resource_exists = False
+        print 'Resource exists: ', self.resource_exists
         print 'Resource was unlinked successfully.'
         time.sleep(10)
 
