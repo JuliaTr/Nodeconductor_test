@@ -60,22 +60,22 @@ class AzureResourceCreationTest(unittest.TestCase):
         print 'Organization was chosen successfully.'
         time.sleep(10)
 
-        # Create project
-        print 'Project is going to be created.'
-        create_project(self.driver, Settings.project_name)
-        time.sleep(5)
-        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        search_field.clear()
-        time.sleep(5)
-        search_field.send_keys(Settings.project_name)
-        time.sleep(5)
-        projects_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
-        time.sleep(5)
-        assert is_in_list(projects_list, Settings.project_name), (
-            'Error: Cannot find project with name  %s ' % Settings.project_name)
+        # # Create project
+        # print 'Project is going to be created.'
+        # create_project(self.driver, Settings.project_name)
+        # time.sleep(5)
+        # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        # search_field.clear()
+        # time.sleep(5)
+        # search_field.send_keys(Settings.project_name)
+        # time.sleep(5)
+        # projects_list = self.driver.find_elements_by_css_selector('[ng-repeat="entity in entityList.list"]')
+        # time.sleep(5)
+        # assert is_in_list(projects_list, Settings.project_name), (
+        #     'Error: Cannot find project with name  %s ' % Settings.project_name)
         self.project_exists = True
-        print 'Prject was created successfully'
-        time.sleep(10)
+        # print 'Prject was created successfully'
+        # time.sleep(10)
 
         # Create resource
         print 'Resource is going to be created.'
@@ -109,31 +109,31 @@ class AzureResourceCreationTest(unittest.TestCase):
         print 'Resource was deleted successfully'
         time.sleep(10)
 
-    def tearDown(self):
-        if self.project_exists:
-            try:
-                # Delete project
-                print 'Project is going to be deleted.'
-                delete_project(self.driver, Settings.project_name)
-                self.project_exists = False
-                time.sleep(10)
-                if not element_exists(self.driver, xpath="//*[contains(text(), 'You have no projects yet.')]"):
-                    search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                    search_field.clear()
-                    time.sleep(5)
-                    search_field.send_keys(Settings.project_name)
-                    time.sleep(10)
-                    if element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'):
-                        self.project_exists = True
-            except Exception as e:
-                print 'Project cannot be deleted. Error: %s' % e
+    # def tearDown(self):
+    #     if self.project_exists:
+    #         try:
+    #             # Delete project
+    #             print 'Project is going to be deleted.'
+    #             delete_project(self.driver, Settings.project_name)
+    #             self.project_exists = False
+    #             time.sleep(10)
+    #             if not element_exists(self.driver, xpath="//*[contains(text(), 'You have no projects yet.')]"):
+    #                 search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    #                 search_field.clear()
+    #                 time.sleep(5)
+    #                 search_field.send_keys(Settings.project_name)
+    #                 time.sleep(10)
+    #                 if element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'):
+    #                     self.project_exists = True
+    #         except Exception as e:
+    #             print 'Project cannot be deleted. Error: %s' % e
 
-        if self.resource_exists:
-            print 'Warning! Test cannot delete resource %s. It has to be deleted manually.' % Settings.resource_name
-        if self.project_exists:
-            print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
+    #     if self.resource_exists:
+    #         print 'Warning! Test cannot delete resource %s. It has to be deleted manually.' % Settings.resource_name
+    #     if self.project_exists:
+    #         print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
 
-        self.driver.quit()
+    #     self.driver.quit()
 
 
 if __name__ == "__main__":

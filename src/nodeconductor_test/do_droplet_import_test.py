@@ -67,9 +67,8 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider is going to be created.'
         # goto main page:
         self.driver.get(Settings.site_url)
-        create_provider_digitalocean(
-            self.driver, Settings.provider_name, Settings.provider_type_name,
-            Settings.token_name, Settings.organization)
+        create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
+                                     Settings.token_name, Settings.organization)
         # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         # search_field.clear()
         # search_field.send_keys(Settings.provider_name)

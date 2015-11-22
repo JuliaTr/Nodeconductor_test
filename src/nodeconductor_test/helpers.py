@@ -26,6 +26,19 @@ def element_exists(driver, css_selector=None, link_text=None, xpath=None):
         return True
 
 
+def force_click(driver, css_selector=None, tries_left=3):
+    """ Tries to get element and click on it several times. """
+    try:
+        element = driver.find_element_by_css_selector(css_selector)
+        element.click()
+    except StaleElementReferenceException as e:
+        tries_left -= 1
+        if tries_left > 0:
+            force_click(driver, css_selector=css_selector, tries_left=tries_left)
+        else:
+            raise e
+
+
 def get_driver(site_url):
     driver = webdriver.Firefox()
     driver.maximize_window()
@@ -306,19 +319,6 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         assert resource_name not in resource.text, 'Error: resource was not deleted, it still exists'
 
 
-def force_click(driver, css_selector=None, tries_left=3):
-    """ Tries to get element and click on it several times. """
-    try:
-        element = driver.find_element_by_css_selector(css_selector)
-        element.click()
-    except StaleElementReferenceException as e:
-        tries_left -= 1
-        if tries_left > 0:
-            force_click(driver, css_selector=css_selector, tries_left=tries_left)
-        else:
-            raise e
-
-
 def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name, organization):
     organization_field = driver.find_element_by_xpath(
         '//span[contains(@class, "customer-name") and contains(text(), "%s")]' % organization)
@@ -450,7 +450,7 @@ def delete_provider(driver, provider_name):
     alert.accept()
 
 
-def create_application(driver, project_name, category_name, resource_type_name, path_name, application_name):
+def create_application_group(driver, project_name, category_name, resource_type_name, path_name, application_name_for_group):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
 
@@ -479,13 +479,52 @@ def create_application(driver, project_name, category_name, resource_type_name, 
     path_field.send_keys(path_name)
 
     application_name_field = driver.find_element_by_id('name')
-    application_name_field.send_keys(application_name)
+
+    application_name_field.send_keys(application_name_for_group)
 
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
 
 
-def delete_application(driver, project_name, time_wait_after_resource_removal, application_name):
+def create_application_project(driver, project_name, category_name, resource_type_name1, application_name_for_project, visibility_level_name):
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+
+    vms = driver.find_element_by_css_selector('[visible="applications"]')
+    vms.click()
+
+    provider_creation = driver.find_element_by_link_text('Create')
+    provider_creation.click()
+
+    categories = driver.find_elements_by_class_name('appstore-template')
+    for category in categories:
+        if category.text == category_name:
+            category.click()
+            break
+
+    resource_types = driver.find_elements_by_class_name('appstore-template')
+    for resource_type in resource_types:
+        if resource_type.text == resource_type_name1:
+            resource_type.click()
+            break
+    time.sleep(5)
+    visibility_levels = driver.find_elements_by_class_name('appstore-template')
+    for visibility_level in visibility_levels:
+        if visibility_level.text == visibility_level_name:
+            visibility_level.click()
+            break
+
+    application_name_field = driver.find_element_by_id('name')
+    application_name_field.send_keys(application_name_for_project)
+
+    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
+    purchase.click()
+
+
+def delete_application_group(driver, project_name, time_wait_after_resource_removal, application_name_for_group):
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
 
@@ -496,7 +535,7 @@ def delete_application(driver, project_name, time_wait_after_resource_removal, a
     applications.click()
 
     resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_search_field.send_keys(application_name)
+    resource_search_field.send_keys(application_name_for_group)
 
     actions = driver.find_element_by_link_text('actions')
     actions.click()
@@ -511,8 +550,43 @@ def delete_application(driver, project_name, time_wait_after_resource_removal, a
     applications.click()
 
     resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_field.send_keys(application_name)
+    resource_field.send_keys(application_name_for_group)
 
     application_list = driver.find_elements_by_class_name('list-box')
     for application in application_list:
-        assert application_name not in application.text, 'Error: application was not deleted, it still exists'
+        assert application_name_for_group not in application.text, 'Error: application was not deleted, it still exists'
+
+
+def delete_application_project(driver, project_name, time_wait_after_resource_removal, application_name_for_project):
+    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
+    dashboard_field.click()
+
+    project = driver.find_element_by_link_text(project_name)
+    project.click()
+
+    applications = driver.find_element_by_css_selector('[visible="applications"]')
+    applications.click()
+
+    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+
+    resource_search_field.send_keys(application_name_for_project)
+
+    actions = driver.find_element_by_link_text('actions')
+    actions.click()
+    remove_field = driver.find_element_by_link_text('Remove')
+    remove_field.click()
+    alert = driver.switch_to_alert()
+    alert.accept()
+    time.sleep(time_wait_after_resource_removal)
+    driver.refresh()
+
+    applications = driver.find_element_by_css_selector('[visible="applications"]')
+    applications.click()
+
+    resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+
+    resource_field.send_keys(application_name_for_project)
+
+    application_list = driver.find_elements_by_class_name('list-box')
+    for application in application_list:
+        assert application_name_for_project not in application.text, 'Error: application was not deleted, it still exists'
