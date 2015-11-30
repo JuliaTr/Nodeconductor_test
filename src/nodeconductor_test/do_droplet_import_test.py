@@ -81,7 +81,7 @@ class NodeconductorTest(unittest.TestCase):
         time.sleep(BaseSettings.search_time_wait)
         print 'Find provider in list'
         xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
-        assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name %s is not found' % Settings.provider_name
+        assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
         self.provider_exists = True
         print 'Find online state of created provider'
         try:
@@ -132,13 +132,10 @@ class NodeconductorTest(unittest.TestCase):
         resource_cost_exists = False
         for row in rows_list:
             if Settings.resource_name in row.text:
-                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost %s ' % Settings.resource_cost
+                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" ' % Settings.resource_cost
                 resource_cost_exists = True
-                print 'I found resource cost %s ' % Settings.resource_cost
-        assert resource_cost_exists, 'Error: Cannot find resource with name %s ' % Settings.resource_name
-        time.sleep(BaseSettings.click_time_wait)
-        activity = self.driver.find_element_by_link_text('Activity')
-        activity.click()
+                print 'Resource cost "%s" was found on page' % Settings.resource_cost
+        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" ' % Settings.resource_name
         time.sleep(BaseSettings.click_time_wait)
         print '----- Cost was checked successfully----- '
 
@@ -172,10 +169,10 @@ class NodeconductorTest(unittest.TestCase):
                 search_field.send_keys(Settings.provider_name)
                 time.sleep(BaseSettings.search_time_wait)
                 assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
-                    'Error: Provider with name %s is found' % Settings.provider_name)
+                    'Error: Provider with name "%s" is found' % Settings.provider_name)
                 print 'Provider was deleted successfully.'
             except Exception as e:
-                print 'Provider cannot be deleted. Error: %s' % e
+                print 'Provider cannot be deleted. Error: "%s"' % e
 
         if self.project_exists:
             try:
@@ -192,14 +189,14 @@ class NodeconductorTest(unittest.TestCase):
                     self.project_exists = True
                 print 'Project was deleted successfully.'
             except Exception as e:
-                print 'Project cannot be deleted. Error: %s' % e
+                print 'Project cannot be deleted. Error: "%s"' % e
 
         if self.resource_exists:
-            print 'Warning! Test cannot unlink resource %s. It has to be unlinked manually.' % Settings.resource_name
+            print 'Warning! Test cannot unlink resource "%s". It has to be unlinked manually.' % Settings.resource_name
         if self.provider_exists:
-            print 'Warning! Test cannot delete provider %s. It has to be deleted manually.' % Settings.provider_name
+            print 'Warning! Test cannot delete provider "%s". It has to be deleted manually.' % Settings.provider_name
         if self.project_exists:
-            print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
+            print 'Warning! Test cannot delete project "%s". It has to be delete manually.' % Settings.project_name
 
         self.driver.quit()
 

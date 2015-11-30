@@ -342,7 +342,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     print 'Push button to create a provider'
     provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
-    print 'I should be on provider creation page'
+    print 'To be on provider creation page'
     time.sleep(BaseSettings.click_time_wait)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
@@ -358,7 +358,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     print 'Put a name of the token'
     token_name_field = driver.find_element_by_id('DigitalOcean_token')
     token_name_field.send_keys(token_name)
-    print 'click on add provider button'
+    print 'Click on add provider button'
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
     print '----- Provider creation process ended -----'
