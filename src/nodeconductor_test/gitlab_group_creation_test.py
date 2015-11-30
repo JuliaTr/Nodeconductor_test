@@ -79,14 +79,14 @@ class ApplicationCreationTest(unittest.TestCase):
         # create_application_group(self.driver, Settings.project_name, Settings.category_name, Settings.resource_type_name,
         #                          Settings.path_name, Settings.application_name_for_group)
         # time.sleep(Settings.time_after_resource_creation)
-        # details_list = self.driver.find_elements_by_class_name('tab-content')
-        # for state in details_list:
-        #     if Settings.application_name_for_group == self.driver.find_element_by_class_name('name').text:
-        #         assert 'Online' in state.text, 'Error: Application group %s is not online.' % Settings.application_name_for_group
-        #         time.sleep(30)
-        #         print 'Application group is in online state.'
-        #     else:
-        #         print 'Error: Cannot find application group with name  %s ' % Settings.application_name_for_group
+        details_list = self.driver.find_elements_by_class_name('tab-content')
+        if Settings.application_name_for_group == self.driver.find_element_by_class_name('name').text:
+            for state in details_list:
+                assert 'Online' in state.text, 'Error: Application group %s is not online.' % Settings.application_name_for_group
+                time.sleep(30)
+                print 'Application group is in online state.'
+        else:
+            print 'Error: Cannot find application group with name  %s ' % Settings.application_name_for_group
         self.application_group_exists = True
         # print 'Application group exists: ', self.application_group_exists
         # print 'Application group was created successfully'
@@ -98,13 +98,13 @@ class ApplicationCreationTest(unittest.TestCase):
                                    Settings.visibility_level_name)
         time.sleep(Settings.time_after_resource_creation)
         details_list = self.driver.find_elements_by_class_name('tab-content')
-        for state in details_list:
-            if Settings.application_name_for_project == self.driver.find_element_by_class_name('name').text:
+        if Settings.application_name_for_project == self.driver.find_element_by_class_name('name').text:
+            for state in details_list:
                 assert 'Online' in state.text, 'Error: Application project %s is not online.' % Settings.application_name_for_project
                 time.sleep(30)
                 print 'Application project is in online state.'
-            else:
-                print 'Error: Cannot find application project with name  %s ' % Settings.application_name_for_project
+        else:
+            print 'Error: Cannot find application project with name  %s ' % Settings.application_name_for_project
         self.application_project_exists = True
         print 'Application project exists: ', self.application_project_exists
         print 'Application project was created successfully'

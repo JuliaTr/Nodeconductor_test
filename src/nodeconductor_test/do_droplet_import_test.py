@@ -36,7 +36,7 @@ class Settings(object):
     token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
     category_name = 'VMs'
     resource_name = 'SIB-test'
-    projected_cost = 'Projected cost $4.69'
+    resource_cost = '$0.43'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -118,15 +118,29 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = True
         print 'Resource was imported successfully.'
 
-        # # goto main page:
-        # go_to_main_page(self.driver)
-        # costs = self.driver.find_element_by_link_text('Costs')
-        # costs.click()
-        # assert Settings.projected_cost == self.driver.find_element_by_class_name('total-cost').text, (
-        #     'Error: Cannot find %s ' % Settings.projected_cost)
-        # activity = self.driver.find_element_by_link_text('Activity')
-        # activity.click()
-        # time.sleep(BaseSettings.click_time_wait)
+        print '----- Cost is going to be checked----- '
+        go_to_main_page(self.driver)
+        costs = self.driver.find_element_by_link_text('Costs')
+        costs.click()
+        time.sleep(BaseSettings.click_time_wait)
+        print 'Select resources tab'
+        resources_list = self.driver.find_element_by_css_selector('[ng-click="row.selected=true; row.activeTab=\'resources\'"]')
+        resources_list.click()
+        time.sleep(BaseSettings.click_time_wait)
+        print 'Find row with the resource in a resource table'
+        rows_list = self.driver.find_elements_by_css_selector('[ng-repeat="resource in row.resources"]')
+        resource_cost_exists = False
+        for row in rows_list:
+            if Settings.resource_name in row.text:
+                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost %s ' % Settings.resource_cost
+                resource_cost_exists = True
+                print 'I found resource cost %s ' % Settings.resource_cost
+        assert resource_cost_exists, 'Error: Cannot find resource with name %s ' % Settings.resource_name
+        time.sleep(BaseSettings.click_time_wait)
+        activity = self.driver.find_element_by_link_text('Activity')
+        activity.click()
+        time.sleep(BaseSettings.click_time_wait)
+        print '----- Cost was checked successfully----- '
 
         # Unlink resource
         print 'Resource is going to be unlinked.'
