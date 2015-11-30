@@ -46,7 +46,7 @@ class NodeconductorTest(unittest.TestCase):
         self.project_exists = False
         self.provider_exists = False
         self.resource_exists = False
-        self.driver.implicitly_wait(20)
+        self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
     def test_create_delete_project_provider_resource(self):
         # Login NC
@@ -187,7 +187,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
 
-    # #     self.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":
