@@ -76,7 +76,6 @@ def choose_organization(driver, organization):
     print '----- Organization selection process ended -----'
 
 
-# To use this function it is necessary to be already on dashboard
 def create_project(driver, project_name, project_description=''):
     print '----- Project creation process started -----'
     go_to_main_page(driver)
@@ -94,7 +93,6 @@ def create_project(driver, project_name, project_description=''):
     print '----- Project creation process ended -----'
 
 
-# To use this function it is necessary to be already on dashboard
 def delete_project(driver, project_name):
     print '----- Project deletion process started -----'
     go_to_main_page(driver)
@@ -397,7 +395,6 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     add_provider_button.click()
 
 
-# To use this function it is necessary to be already on dashboard
 def import_resource(driver, project_name, provider_name, category_name, resource_name):
     print '----- Resource import process started -----'
     go_to_main_page(driver)
@@ -432,7 +429,6 @@ def import_resource(driver, project_name, provider_name, category_name, resource
     print '----- Resource import process ended -----'
 
 
-# To use this function it is necessary to be already on dashboard
 def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process started -----'
     go_to_main_page(driver)
