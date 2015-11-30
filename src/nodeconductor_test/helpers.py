@@ -1,7 +1,15 @@
 import time
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+import urlparse
+
+from base import BaseSettings
+
+
+def go_to_main_page(driver):
+    split = urlparse.urlsplit(driver.current_url)
+    driver.get('%s://%s/' % (split.scheme, split.netloc))
 
 
 def is_in_list(list_element, text):
@@ -25,6 +33,19 @@ def element_exists(driver, css_selector=None, link_text=None, xpath=None):
         return True
 
 
+def force_click(driver, css_selector=None, tries_left=3):
+    """ Tries to get element and click on it several times. """
+    try:
+        element = driver.find_element_by_css_selector(css_selector)
+        element.click()
+    except StaleElementReferenceException as e:
+        tries_left -= 1
+        if tries_left > 0:
+            force_click(driver, css_selector=css_selector, tries_left=tries_left)
+        else:
+            raise e
+
+
 def get_driver(site_url):
     driver = webdriver.Firefox()
     driver.maximize_window()
@@ -33,63 +54,71 @@ def get_driver(site_url):
 
 
 def login_nodeconductor(driver, username, password):
+    print '----- Logging in started -----'
     element = driver.find_element_by_class_name('take-a-tour')
     element.click()
-    time.sleep(2)
     username_field = driver.find_element_by_css_selector('[ng-model="auth.user.username"]')
     username_field.send_keys(username)
     password_field = driver.find_element_by_css_selector('[ng-model="auth.user.password"]')
     password_field.send_keys(password)
     login_field = driver.find_element_by_class_name('button-login')
     login_field.click()
+    print '----- Logging in ended -----'
 
 
 def choose_organization(driver, organization):
+    print '----- Organization selection process started -----'
     organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
+    print 'Go to organization page'
     organization = driver.find_element_by_link_text(organization)
     organization.click()
-    time.sleep(10)
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
+    print '----- Organization selection process ended -----'
 
 
+# To use this function it is necessary to be already on dashboard
 def create_project(driver, project_name, project_description=''):
+    print '----- Project creation process started -----'
+    go_to_main_page(driver)
     add_new_project_field = driver.find_element_by_class_name('button-apply')
     add_new_project_field.click()
-    time.sleep(5)
+    print 'Create a project'
     project_name_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.name"]')
     project_name_field.send_keys(project_name)
     if project_description:
         project_description_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.description"]')
         project_description_field.send_keys(project_description)
+    print 'Click on create project button'
     create_project_field = driver.find_element_by_class_name('button-apply')
     create_project_field.click()
-    time.sleep(10)
-    back_to_list_field = driver.find_element_by_class_name('back-to-list')
-    back_to_list_field.click()
+    print '----- Project creation process ended -----'
 
 
+# To use this function it is necessary to be already on dashboard
 def delete_project(driver, project_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(5)
+    print '----- Project deletion process started -----'
+    go_to_main_page(driver)
+    print 'Go to projects tab'
     projects = driver.find_element_by_link_text(project_name)
     projects.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Go to list of projects page'
     back_to_list_field = driver.find_element_by_class_name('back-to-list')
     back_to_list_field.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Put project name to search field'
     project_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     project_search_field.send_keys(project_name)
-    time.sleep(5)
-    actions_field = driver.find_element_by_link_text('actions')
-    actions_field.click()
+    time.sleep(BaseSettings.search_time_wait)
+    print 'Open project actions'
+    force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
+    print 'Click on remove button'
     remove_field = driver.find_element_by_link_text('Remove')
     remove_field.click()
-    time.sleep(5)
+    print 'Accept project delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
+    print '----- Project deletion process ended -----'
 
 
 def create_ssh_key(driver, user_full_name, key_name):
@@ -142,109 +171,104 @@ def delete_ssh_key(driver, key_name, user_full_name):
 
 def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
                               image_name, flavor_name, public_key_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(5)
     project = driver.find_element_by_link_text(project_name)
     project.click()
-    time.sleep(5)
+
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
-    time.sleep(5)
+
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
         if category.text == category_name:
             category.click()
             break
-    time.sleep(5)
+
     providers = driver.find_elements_by_class_name('appstore-template')
     for provider in providers:
         if provider.text == provider_name_in_resource:
             provider.click()
             break
-    time.sleep(10)
+
     resource_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
     resource_name_field.send_keys(resource_name)
-    time.sleep(5)
+
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
         if image.text == image_name:
             image.click()
             break
-    time.sleep(5)
+
     flavors = driver.find_elements_by_class_name('title')
     for flavor in flavors:
         if flavor.text == flavor_name:
             flavor.click()
             break
-    time.sleep(5)
+
     public_keys = driver.find_elements_by_class_name('description-ssh_public_key')
     for public_key in public_keys:
         if public_key.text == public_key_name:
             public_key.click()
             break
-    time.sleep(5)
+
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
 
 
+# To use this function it is necessary to be already on dashboard
 def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
                           username, os_password, size_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(5)
     project = driver.find_element_by_link_text(project_name)
     project.click()
-    time.sleep(5)
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
-    time.sleep(5)
+    # time.sleep(BaseSettings.click_time_wait)
+    force_click(driver, css_selector='[visible="vms"]')
+    print 'vms tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
         if category.text == category_name:
             category.click()
             break
-    time.sleep(5)
+
     providers = driver.find_elements_by_class_name('appstore-template')
     for provider in providers:
         if provider.text == provider_name:
             provider.click()
             break
-    time.sleep(10)
+
     resource_os_username_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
     resource_os_username_field.send_keys(username)
-    time.sleep(5)
+
     os_password_field = driver.find_element_by_class_name('appstore-password')
     os_password_field.send_keys(os_password)
-    time.sleep(5)
+
     repeat_os_password_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[\'repeat_password\']"]')
     repeat_os_password_field.send_keys(os_password)
-    time.sleep(5)
+
     repeat_os_password_field = driver.find_element_by_id('name')
     repeat_os_password_field.send_keys(resource_name)
-    time.sleep(5)
+
     search_field = driver.find_element_by_css_selector('[ng-model="field.searchQuery"]')
-    time.sleep(5)
+    time.sleep(BaseSettings.search_time_wait)
     search_field.send_keys(image_name)
-    time.sleep(10)
+
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
         if image.text == image_name:
             image.click()
             break
-    time.sleep(5)
+
     sizes = driver.find_elements_by_class_name('title')
     for size in sizes:
         if size.text == size_name:
             size.click()
             break
-    time.sleep(5)
+
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
 
@@ -305,29 +329,41 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         assert resource_name not in resource.text, 'Error: resource was not deleted, it still exists'
 
 
-def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name, organization):
+    print '----- Provider creation process started -----'
+    print 'Go to organization page'
+    organization_field = driver.find_element_by_xpath(
+        '//span[contains(@class, "customer-name") and contains(text(), "%s")]' % organization)
     organization_field.click()
-    time.sleep(5)
     organization_details = driver.find_element_by_link_text('Details')
     organization_details.click()
-    time.sleep(10)
-    providers = driver.find_element_by_css_selector('[visible="providers"]')
-    providers.click()
-    time.sleep(5)
+    print 'Go to providers tab'
+    force_click(driver, css_selector='[visible="providers"]')
+    print 'providers tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Push button to create a provider'
     provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
-    time.sleep(5)
-    provider_type = driver.find_element_by_class_name(provider_type_name)
-    provider_type.click()
-    time.sleep(5)
+    print 'I should be on provider creation page'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Provider type selection'
+    provider_type_list = driver.find_elements_by_class_name('appstore-template')
+    for provider_type in provider_type_list:
+        if provider_type.text == provider_type_name:
+            provider_type.click()
+            break
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Give provider a name'
     provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
+    print 'Put a name of the token'
     token_name_field = driver.find_element_by_id('DigitalOcean_token')
     token_name_field.send_keys(token_name)
+    print 'click on add provider button'
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
+    print '----- Provider creation process ended -----'
 
 
 # Method isn't completed yet.
@@ -361,75 +397,86 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     add_provider_button.click()
 
 
-def import_resource(driver, project_name, provider_name, resource_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(10)
+# To use this function it is necessary to be already on dashboard
+def import_resource(driver, project_name, provider_name, category_name, resource_name):
+    print '----- Resource import process started -----'
+    go_to_main_page(driver)
+    print 'Go to project page'
     project = driver.find_element_by_link_text(project_name)
     project.click()
-    time.sleep(8)
+    print 'Go to resource tab'
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Import a resource'
     resource_import = driver.find_element_by_link_text('Import')
     resource_import.click()
-    time.sleep(5)
+    print 'Category selection'
     category_list = driver.find_elements_by_class_name('appstore-template')
     for category in category_list:
-        if category.text == 'VMs':
+        if category.text == category_name:
             category.click()
             break
-    time.sleep(5)
+    print 'Provider selection'
     provider_list = driver.find_elements_by_class_name('appstore-template')
     for provider in provider_list:
         if provider.text == provider_name:
             provider.click()
             break
-    time.sleep(5)
+    print 'Put resource name'
     resource = driver.find_element_by_link_text(resource_name)
     resource.click()
-    time.sleep(5)
+    print 'Click on import button'
     import_button = driver.find_element_by_link_text('Import')
     import_button.click()
+    print '----- Resource import process ended -----'
 
 
+# To use this function it is necessary to be already on dashboard
 def unlink_resource(driver, project_name, resource_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(10)
+    print '----- Resource unlink process started -----'
+    go_to_main_page(driver)
+    print 'Go to project page'
     project = driver.find_element_by_link_text(project_name)
     project.click()
-    time.sleep(10)
+    print 'Go to resource tab'
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Put resource name to search field'
     resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     resource_search_field.send_keys(resource_name)
-    time.sleep(5)
-    actions = driver.find_element_by_link_text('actions')
-    actions.click()
+    time.sleep(BaseSettings.search_time_wait)
+    print 'Open project actions'
+    force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
+    print 'Click on remove button'
     unlink_field = driver.find_element_by_link_text('Unlink')
     unlink_field.click()
+    print '----- Resource unlink process ended -----'
 
 
-def delete_provider(driver, provider_name):
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+def delete_provider(driver, provider_name, organization):
+    print '----- Provider deletion process started -----'
+    print 'Go to organization page'
+    organization_field = driver.find_element_by_xpath(
+        '//span[contains(@class, "customer-name") and contains(text(), "%s")]' % organization)
     organization_field.click()
-    time.sleep(5)
     organization_details = driver.find_element_by_link_text('Details')
     organization_details.click()
-    time.sleep(10)
-    providers = driver.find_element_by_css_selector('[visible="providers"]')
-    providers.click()
-    time.sleep(5)
+    print 'Go to providers tab'
+    force_click(driver, css_selector='[visible="providers"]')
+    print 'Providers tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Put provider name to search field'
     provider_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     provider_search_field.send_keys(provider_name)
-    time.sleep(10)
-    remove_provider = driver.find_element_by_link_text('Delete')
-    remove_provider.click()
-    time.sleep(5)
+    time.sleep(BaseSettings.search_time_wait)
+    print 'Click on delete button'
+    force_click(driver, css_selector='[ng-class="{\'disabled\': button.isDisabled(buttonModel)}"]')
+    print 'Accept project delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
+    print '----- Provider deletion process ended -----'
 
 
 def create_application_group(driver, project_name, category_name, resource_type_name, path_name, application_name_for_group):
