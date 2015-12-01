@@ -20,7 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_provider_digitalocean, import_resource, unlink_resource, delete_provider,
-                     element_exists, force_click, go_to_main_page)
+                     element_exists, go_to_main_page)
 from base import BaseSettings
 
 
@@ -36,7 +36,7 @@ class Settings(object):
     token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
     category_name = 'VMs'
     resource_name = 'SIB-test'
-    resource_cost = '$0.43'
+    resource_cost = '$5.00'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -98,24 +98,24 @@ class NodeconductorTest(unittest.TestCase):
         print 'Resource is going to be imported.'
         import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
                         Settings.resource_name)
+        print 'Search imported resource'
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        search_field.clear()
+        search_field.send_keys(Settings.resource_name)
+        time.sleep(BaseSettings.search_time_wait)
+        print 'Go to resource page'
+        resource = self.driver.find_element_by_link_text(Settings.resource_name)
+        resource.click()
         time.sleep(BaseSettings.click_time_wait)
-        # TODO: Implement resource existance check after fix of resource list
-
-        # element = WebDriverWait(self.driver, 10).until(
-        #     EC.presence_of_element_located((By.CLASS_NAME, "status-circle")))
-        # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        # search_field.clear()
-        # time.sleep(BaseSettings.click_time_wait)
-        # search_field.send_keys(Settings.resource_name)
-        # time.sleep(BaseSettings.search_time_wait)
-        # resource = self.driver.find_element_by_css_selector('[href="#/resources/DigitalOcean.Droplet/f352b53521ac4f7c9d72f5ea07af5bf1/"]')
-        # resource.click()
-        # time.sleep(BaseSettings.click_time_wait)
-        # xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.resource_name
-        # self.project_exists = bool(self.driver.find_elements_by_xpath(xpath))
-        # assert self.project_exists, 'Cannot import resource "%s"' % Settings.resource_name
-        print 'Resource exists: ', self.resource_exists
+        print 'Check imported resource existence'
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.resource_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot import resource "%s"' % Settings.resource_name
         self.resource_exists = True
+        print 'Resource exists: ', self.resource_exists
+        print 'Check imported resource state'
+        xpath = '//dd[contains(text(), "Online")]'
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Error: Imported resource "%s" is not online.' % Settings.resource_name
+        print 'Imported resource is in online state'
         print 'Resource was imported successfully.'
 
         print '----- Cost is going to be checked----- '
@@ -142,15 +142,14 @@ class NodeconductorTest(unittest.TestCase):
         # Unlink resource
         print 'Resource is going to be unlinked.'
         unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
-        time.sleep(BaseSettings.click_time_wait)
-        # TODO: Implement resource existance check after fix of resource list
-
-        # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        # search_field.clear()
-        # search_field.send_keys(Settings.resource_name)
-        # time.sleep(BaseSettings.search_time_wait)
-        # assert not element_exists(self.driver, xpath='//div[@class="tab-content" and contains(text(), "%s")]' % Settings.resource_name), (
-        #     'Error: Resource with name %s is found' % Settings.resource_name)
+        print 'Search imported resource'
+        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        search_field.clear()
+        search_field.send_keys(Settings.resource_name)
+        time.sleep(BaseSettings.search_time_wait)
+        print 'Check unlinked resource existence'
+        assert not element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.resource_name), (
+            'Error: Resource with name %s is found' % Settings.resource_name)
         self.resource_exists = False
         print 'Resource exists: ', self.resource_exists
         print 'Resource was unlinked successfully.'
@@ -198,7 +197,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project "%s". It has to be delete manually.' % Settings.project_name
 
-        self.driver.quit()
+        # self.driver.quit()
 
 
 if __name__ == "__main__":

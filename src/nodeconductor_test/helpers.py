@@ -1,7 +1,10 @@
 import time
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import urlparse
 
 from base import BaseSettings
@@ -10,6 +13,7 @@ from base import BaseSettings
 def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
+
 
 
 def is_in_list(list_element, text):
@@ -33,15 +37,18 @@ def element_exists(driver, css_selector=None, link_text=None, xpath=None):
         return True
 
 
-def force_click(driver, css_selector=None, tries_left=3):
+def force_click(driver, css_selector=None, xpath=None, tries_left=3):
     """ Tries to get element and click on it several times. """
     try:
-        element = driver.find_element_by_css_selector(css_selector)
+        if css_selector is not None:
+            element = driver.find_element_by_css_selector(css_selector)
+        elif xpath is not None:
+            element = driver.find_element_by_xpath(xpath)
         element.click()
     except StaleElementReferenceException as e:
         tries_left -= 1
         if tries_left > 0:
-            force_click(driver, css_selector=css_selector, tries_left=tries_left)
+            force_click(driver, css_selector=css_selector, xpath=xpath, tries_left=tries_left)
         else:
             raise e
 
@@ -395,15 +402,17 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     add_provider_button.click()
 
 
+# Function is aplicable.
+# TODO: wait of execution of ticket with bug of clicking on element immediately after the end of page loading
 def import_resource(driver, project_name, provider_name, category_name, resource_name):
     print '----- Resource import process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
+    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to resource tab'
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
+    force_click(driver, css_selector='[visible="vms"]')
     time.sleep(BaseSettings.click_time_wait)
     print 'Import a resource'
     resource_import = driver.find_element_by_link_text('Import')
@@ -429,15 +438,25 @@ def import_resource(driver, project_name, provider_name, category_name, resource
     print '----- Resource import process ended -----'
 
 
+# Function is aplicable.
+# TODO: wait of execution of ticket with bug of clicking on element immediately after the end of page loading
 def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
+    time.sleep(8) # bug of clicking on element immediately after the end of page loading
+    # try:
+    #     WebDriverWait(driver, 10).until(
+    #         EC.invisibility_of_element_located((By.CSS_SELECTOR, '[ng-class="$_blockUiMessageClass"]')))
+    # except TimeoutException as e:
+    #     print 'Error: '
+    #     raise e
+    # else:
+    #     print 'OK'
+    project = driver.find_element_by_xpath('//a[@ui-sref="projects.details({uuid: project.uuid})" and contains(text(), "%s")]' % project_name)
     project.click()
     print 'Go to resource tab'
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
+    force_click(driver, xpath='//li[@visible="vms"]')
     time.sleep(BaseSettings.click_time_wait)
     print 'Put resource name to search field'
     resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
@@ -469,7 +488,7 @@ def delete_provider(driver, provider_name, organization):
     time.sleep(BaseSettings.search_time_wait)
     print 'Click on delete button'
     force_click(driver, css_selector='[ng-class="{\'disabled\': button.isDisabled(buttonModel)}"]')
-    print 'Accept project delete confirmation popup'
+    print 'Accept provider delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
     print '----- Provider deletion process ended -----'
