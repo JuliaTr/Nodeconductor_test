@@ -149,12 +149,13 @@ class NodeconductorTest(unittest.TestCase):
         time.sleep(BaseSettings.search_time_wait)
         print 'Check unlinked resource existence'
         assert not element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.resource_name), (
-            'Error: Resource with name %s is found' % Settings.resource_name)
+            'Error: Resource with name "%s" was not unlinked, it still exists' % Settings.resource_name)
         self.resource_exists = False
         print 'Resource exists: ', self.resource_exists
         print 'Resource was unlinked successfully.'
 
     def tearDown(self):
+        print '\n\n\n --- TEARDOWN ---'
         print 'Provider exists: ', self.provider_exists
         if self.provider_exists:
             try:
@@ -168,7 +169,7 @@ class NodeconductorTest(unittest.TestCase):
                 search_field.send_keys(Settings.provider_name)
                 time.sleep(BaseSettings.search_time_wait)
                 assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
-                    'Error: Provider with name "%s" is found' % Settings.provider_name)
+                    'Error: Provider with name "%s" was not deleted, it still exists' % Settings.provider_name)
                 print 'Provider was deleted successfully.'
             except Exception as e:
                 print 'Provider cannot be deleted. Error: "%s"' % e
@@ -197,7 +198,7 @@ class NodeconductorTest(unittest.TestCase):
         if self.project_exists:
             print 'Warning! Test cannot delete project "%s". It has to be delete manually.' % Settings.project_name
 
-        # self.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":
