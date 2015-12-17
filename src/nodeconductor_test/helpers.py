@@ -1,10 +1,10 @@
+import datetime
+import os
 import time
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+
 import urlparse
 
 from base import BaseSettings
@@ -14,6 +14,13 @@ def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
 
+
+def make_screenshot(driver, name=None):
+    if name is None:
+        name = str(datetime.datetime.now()) + '.png'
+    if not os.path.exists(BaseSettings.screenshots_folder):
+        os.makedirs(BaseSettings.screenshots_folder)
+    driver.save_screenshot(os.path.join(BaseSettings.screenshots_folder, name))
 
 
 def is_in_list(list_element, text):
@@ -55,7 +62,8 @@ def force_click(driver, css_selector=None, xpath=None, tries_left=3):
 
 def get_driver(site_url):
     driver = webdriver.Firefox()
-    driver.maximize_window()
+    # driver.set_window_size(420, 580) # to test mobile version
+    driver.maximize_window()  # to test mobile version comment this line
     driver.get(site_url)
     return driver
 
@@ -118,8 +126,8 @@ def delete_project(driver, project_name):
     print 'Open project actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
-    remove_field = driver.find_element_by_link_text('Remove')
-    remove_field.click()
+    project_remove = driver.find_element_by_link_text('Remove')
+    project_remove.click()
     print 'Accept project delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
@@ -127,19 +135,24 @@ def delete_project(driver, project_name):
 
 
 def create_ssh_key(driver, user_full_name, key_name):
-    user_field = driver.find_element_by_link_text(user_full_name)
+    print '----- SSH key creation process started -----'
+    print 'Go to profile page'
+    user_field = driver.find_element_by_class_name('user-name')
     user_field.click()
-    profile_field = driver.find_element_by_link_text('Profile')
-    profile_field.click()
-    time.sleep(10)
-    keys = driver.find_element_by_css_selector('[visible="keys"]')
-    keys.click()
-    time.sleep(15)
+    profile = driver.find_element_by_link_text('Profile')
+    profile.click()
+    print 'Go to keys tab'
+    force_click(driver, css_selector='[visible="keys"]')
+    print 'keys tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Push button to add SSH key'
     keys_field = driver.find_element_by_link_text('Add SSH Key')
     keys_field.click()
-    time.sleep(15)
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Give a name to a key'
     key_name_field = driver.find_element_by_css_selector('[ng-model="KeyAdd.instance.name"]')
     key_name_field.send_keys(key_name)
+    print 'Give a public key '
     public_key_field = driver.find_element_by_css_selector('[ng-model="KeyAdd.instance.public_key"]')
     public_key_field.send_keys(
         'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/TUNt44JCGCtRyGL/7hb+98YRkZesFRjIdgNtIBwmJ0W1Ikqa3sMn'
@@ -147,79 +160,87 @@ def create_ssh_key(driver, user_full_name, key_name):
         'chlYlSPX56e9U4o7q9gR0mkbAUfZN27VaZL7AVe8TXTqYaF8Zg8pB+ru0u0M5xaqTY6nLqps/LClePXKx3HdKVw5wEOf'
         'YNSdqWUFUHr4L7poe1hgzk4M0ZVMVGTXxs7FlUhOb6RxkvgmNC/saU3PWhAQK777iIMmA1OPr2QJkooIYEw4i4crCULy'
         'U9Bm1ehDsvuB marchukpavelp@gmail.com')
-    time.sleep(5)
+    print 'Click on add key button'
     add_key_field = driver.find_element_by_class_name('button-apply')
     add_key_field.click()
+    print '----- SSH key creation process ended -----'
 
 
 def delete_ssh_key(driver, key_name, user_full_name):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(5)
-    user_field = driver.find_element_by_link_text(user_full_name)
+    print '----- SSH key deletion process started -----'
+    print 'Go to profile page'
+    user_field = driver.find_element_by_class_name('user-name')
     user_field.click()
-    profile_field = driver.find_element_by_link_text('Profile')
-    profile_field.click()
-    time.sleep(5)
-    keys = driver.find_element_by_css_selector('[visible="keys"]')
-    keys.click()
-    time.sleep(5)
+    profile = driver.find_element_by_link_text('Profile')
+    profile.click()
+    print 'Go to keys tab'
+    force_click(driver, css_selector='[visible="keys"]')
+    print 'keys tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Put project name to search field'
     ssh_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     ssh_search_field.send_keys(key_name)
-    time.sleep(5)
-    ssh_key_remove_field = driver.find_element_by_link_text('Remove')
-    ssh_key_remove_field.click()
-    time.sleep(8)
+    time.sleep(BaseSettings.search_time_wait)
+    print 'Click on remove button'
+    ssh_key_remove = driver.find_element_by_link_text('Remove')
+    ssh_key_remove.click()
+    print 'Accept project delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
+    print '----- SSH key deletion process ended -----'
 
 
 def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
                               image_name, flavor_name, public_key_name):
+    print '----- Resource creation process started -----'
+    go_to_main_page(driver)
+    print 'Go to project page'
     project = driver.find_element_by_link_text(project_name)
     project.click()
-
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
+    print 'Go to vms tab'
+    force_click(driver, css_selector='[visible="vms"]')
+    print 'vms tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
+    print 'Create a resource'
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
-
+    print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
         if category.text == category_name:
             category.click()
             break
-
+    print 'Provider selection'
     providers = driver.find_elements_by_class_name('appstore-template')
     for provider in providers:
         if provider.text == provider_name_in_resource:
             provider.click()
             break
-
+    print 'Put resource name'
     resource_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
     resource_name_field.send_keys(resource_name)
-
+    print 'Image selection'
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
         if image.text == image_name:
             image.click()
             break
-
+    print 'Flavor selection'
     flavors = driver.find_elements_by_class_name('title')
     for flavor in flavors:
         if flavor.text == flavor_name:
             flavor.click()
             break
-
+    print 'Public key selection'
     public_keys = driver.find_elements_by_class_name('description-ssh_public_key')
     for public_key in public_keys:
         if public_key.text == public_key_name:
             public_key.click()
             break
-
+    print 'Click on purchase button'
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
+    print '----- Resource creation process ended -----'
 
 
 # To use this function it is necessary to be already on dashboard
@@ -334,14 +355,14 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         assert resource_name not in resource.text, 'Error: resource was not deleted, it still exists'
 
 
-def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name, organization):
+def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
-    organization_field = driver.find_element_by_xpath(
-        '//span[contains(@class, "customer-name") and contains(text(), "%s")]' % organization)
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
     organization_details = driver.find_element_by_link_text('Details')
     organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
     print 'Go to providers tab'
     force_click(driver, css_selector='[visible="providers"]')
     print 'providers tab was successfully choosen'
@@ -358,13 +379,52 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
             provider_type.click()
             break
     time.sleep(BaseSettings.click_time_wait)
-    print 'Give provider a name'
+    print 'Give a name to provider'
     provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
     print 'Put a name of the token'
     token_name_field = driver.find_element_by_id('DigitalOcean_token')
     token_name_field.send_keys(token_name)
+    print 'Click on add provider button'
+    add_provider_button = driver.find_element_by_link_text('Add provider')
+    add_provider_button.click()
+    print '----- Provider creation process ended -----'
+
+
+def create_provider_amazon(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
+    print '----- Provider creation process started -----'
+    print 'Go to organization page'
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Go to providers tab'
+    force_click(driver, css_selector='[visible="providers"]')
+    print 'providers tab was successfully choosen'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Push button to create a provider'
+    provider_creation = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Create provider\')]]')
+    provider_creation.click()
+    print 'To be on provider creation page'
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Provider type selection'
+    provider_type_list = driver.find_elements_by_class_name('appstore-template')
+    for provider_type in provider_type_list:
+        if provider_type.text == provider_type_name:
+            provider_type.click()
+            break
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Give a name to provider'
+    provider_name_field = driver.find_element_by_css_selector('[ng-model="ServiceAdd.model.serviceName"]')
+    provider_name_field.clear()
+    provider_name_field.send_keys(provider_name)
+    print 'Put a name of the access key id'
+    access_key_id_name_field = driver.find_element_by_id('Amazon_username')
+    access_key_id_name_field.send_keys(access_key_id_name)
+    secret_access_key_name_field = driver.find_element_by_id('Amazon_token')
+    secret_access_key_name_field.send_keys(secret_access_key_name)
     print 'Click on add provider button'
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
@@ -402,13 +462,10 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     add_provider_button.click()
 
 
-# Function is aplicable.
-# TODO: wait of execution of ticket with bug of clicking on element immediately after the end of page loading
 def import_resource(driver, project_name, provider_name, category_name, resource_name):
     print '----- Resource import process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to resource tab'
@@ -438,22 +495,11 @@ def import_resource(driver, project_name, provider_name, category_name, resource
     print '----- Resource import process ended -----'
 
 
-# Function is aplicable.
-# TODO: wait of execution of ticket with bug of clicking on element immediately after the end of page loading
 def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8) # bug of clicking on element immediately after the end of page loading
-    # try:
-    #     WebDriverWait(driver, 10).until(
-    #         EC.invisibility_of_element_located((By.CSS_SELECTOR, '[ng-class="$_blockUiMessageClass"]')))
-    # except TimeoutException as e:
-    #     print 'Error: '
-    #     raise e
-    # else:
-    #     print 'OK'
-    project = driver.find_element_by_xpath('//a[@ui-sref="projects.details({uuid: project.uuid})" and contains(text(), "%s")]' % project_name)
+    project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to resource tab'
     force_click(driver, xpath='//li[@visible="vms"]')
@@ -470,11 +516,10 @@ def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process ended -----'
 
 
-def delete_provider(driver, provider_name, organization):
+def delete_provider(driver, provider_name):
     print '----- Provider deletion process started -----'
     print 'Go to organization page'
-    organization_field = driver.find_element_by_xpath(
-        '//span[contains(@class, "customer-name") and contains(text(), "%s")]' % organization)
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
     organization_field.click()
     organization_details = driver.find_element_by_link_text('Details')
     organization_details.click()
@@ -498,7 +543,6 @@ def create_application_group(driver, project_name, category_name, resource_type_
     print '----- Application group creation process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to applications tab'
@@ -538,7 +582,6 @@ def create_application_project(driver, project_name, category_name, resource_typ
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to applications tab'
@@ -581,7 +624,6 @@ def delete_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to applications tab'
@@ -591,6 +633,7 @@ def delete_application_group(driver, project_name, application_group_name):
     print 'Put application group name to search field'
     resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
     resource_search_field.send_keys(application_group_name)
+    time.sleep(BaseSettings.search_time_wait)
     print 'Open application group actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
@@ -606,7 +649,6 @@ def delete_application_project(driver, project_name, application_project_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
-    time.sleep(8)  # bug of clicking on element immediately after the end of page loading
     project = driver.find_element_by_link_text(project_name)
     project.click()
     print 'Go to applications tab'

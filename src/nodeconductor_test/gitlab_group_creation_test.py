@@ -10,6 +10,7 @@
 
 import time
 import unittest
+import sys
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -18,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_application_group, element_exists, delete_application_group, create_application_project,
-                     delete_application_project)
+                     delete_application_project, make_screenshot)
 from base import BaseSettings
 
 
@@ -32,8 +33,8 @@ class Settings(object):
     category_name = 'APPLICATIONS'
     resource_type_name = 'Group'
     resource_type_name1 = 'Project'
-    path_name = 'test-group-1'
-    application_group_name = 'Test group-1'
+    path_name = 'test-group'
+    application_group_name = 'Test group'
     visibility_level_name = 'The project can be cloned by any logged in user.'
     application_project_name = 'Test project'
 
@@ -109,6 +110,8 @@ class ApplicationCreationTest(unittest.TestCase):
 
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
+        if sys.exc_info()[0] is not None:
+            make_screenshot(self.driver)
         if self.application_project_exists:
             try:
                 # Delete application project

@@ -21,7 +21,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider_digitalocean, import_resource, unlink_resource, delete_provider,
+                     create_provider_amazon, import_resource, unlink_resource, delete_provider,
                      element_exists, go_to_main_page, make_screenshot)
 from base import BaseSettings
 
@@ -32,13 +32,14 @@ class Settings(object):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     organization = 'Test only org'
-    project_name = 'DO test project'
-    provider_type_name = 'DigitalOcean'
-    provider_name = 'DigitalOceanTest provider'
-    token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
+    project_name = 'Amazon test project'
+    provider_type_name = 'Amazon'
+    provider_name = 'AmazonTest provider'
+    access_key_id_name = 'AKIAIHOQGSGNVO6SYFWA'
+    secret_access_key_name = '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'
     category_name = 'VMs'
-    resource_name = 'SIB-test'
-    resource_cost = '$5.00'
+    resource_name = 'old.opennodecloud.com'
+    resource_cost = '$9.67'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -74,8 +75,8 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
-        create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
-                                     Settings.token_name)
+        create_provider_amazon(self.driver, Settings.provider_name, Settings.provider_type_name,
+                               Settings.access_key_id_name, Settings.secret_access_key_name)
         print 'Search created provider'
         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()
@@ -134,10 +135,10 @@ class NodeconductorTest(unittest.TestCase):
         resource_cost_exists = False
         for row in rows_list:
             if Settings.resource_name in row.text:
-                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" to check cost' % Settings.resource_cost
+                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" ' % Settings.resource_cost
                 resource_cost_exists = True
                 print 'Resource cost "%s" was found on page' % Settings.resource_cost
-        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" ' % Settings.resource_name
+        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" to check cost' % Settings.resource_name
         time.sleep(BaseSettings.click_time_wait)
         print '----- Cost was checked successfully----- '
 
