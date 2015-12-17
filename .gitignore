@@ -3,5 +3,6 @@
 
 venv
 screenshots
+src/nodeconductor_test/private_settings.py
 
 *.pyc

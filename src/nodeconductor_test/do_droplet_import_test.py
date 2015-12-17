@@ -22,11 +22,13 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_provider_digitalocean, import_resource, unlink_resource, delete_provider,
-                     element_exists, go_to_main_page, make_screenshot)
+                     element_exists, go_to_main_page, make_screenshot, get_private_parent)
 from base import BaseSettings
 
+private_parent = get_private_parent('DOPrivateSettings')
 
-class Settings(object):
+
+class Settings(BaseSettings, private_parent):
     site_url = "http://web-test.nodeconductor.com"
     username = 'Alice'
     password = 'Alice'
@@ -35,7 +37,6 @@ class Settings(object):
     project_name = 'DO test project'
     provider_type_name = 'DigitalOcean'
     provider_name = 'DigitalOceanTest provider'
-    token_name = '6ac9ad515e61dc80fddd6f9ee83f3b866fa2b6dc8cc1274dd2becc89241dd710'
     category_name = 'VMs'
     resource_name = 'SIB-test'
     resource_cost = '$5.00'

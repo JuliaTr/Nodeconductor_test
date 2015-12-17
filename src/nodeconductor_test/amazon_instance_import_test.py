@@ -22,11 +22,13 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_provider_amazon, import_resource, unlink_resource, delete_provider,
-                     element_exists, go_to_main_page, make_screenshot)
+                     element_exists, go_to_main_page, make_screenshot, get_private_parent)
 from base import BaseSettings
 
+private_parent = get_private_parent('AmazonPrivateSettings')
 
-class Settings(object):
+
+class Settings(BaseSettings, private_parent):
     site_url = "http://web-test.nodeconductor.com"
     username = 'Alice'
     password = 'Alice'
@@ -35,8 +37,6 @@ class Settings(object):
     project_name = 'Amazon test project'
     provider_type_name = 'Amazon'
     provider_name = 'AmazonTest provider'
-    access_key_id_name = 'AKIAIHOQGSGNVO6SYFWA'
-    secret_access_key_name = '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'
     category_name = 'VMs'
     resource_name = 'old.opennodecloud.com'
     resource_cost = '$9.67'

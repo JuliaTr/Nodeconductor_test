@@ -10,6 +10,19 @@ import urlparse
 from base import BaseSettings
 
 
+def get_private_parent(class_name):
+    private_parent = object  # empty private parent if it is not defined
+    try:
+        import private_settings
+    except ImportError:
+        # private settings is not defined. Do nothing.
+        pass
+    else:
+        if hasattr(private_settings, class_name):   # check if private settings is defined for Amazon
+            private_parent = getattr(private_settings, class_name)  # add Amazon settings to list of parents
+    return private_parent
+
+
 def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
