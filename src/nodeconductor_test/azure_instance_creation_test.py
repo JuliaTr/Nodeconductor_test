@@ -63,16 +63,16 @@ class AzureResourceCreationTest(unittest.TestCase):
         choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
 
-         # # Create project
-        # print 'Project is going to be created.'
-        # # goto main page:
-        # self.driver.get(Settings.site_url)
-        # create_project(self.driver, Settings.project_name)
-        # time.sleep(BaseSettings.click_time_wait)
-        # xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        # self.project_exists = bool(self.driver.find_elements_by_xpath(xpath))
-        # assert self.project_exists, 'Cannot create project "%s"' % Settings.project_name
-        # print 'Prject was created successfully'
+        # Create project
+        print 'Project is going to be created.'
+        # goto main page:
+        self.driver.get(Settings.site_url)
+        create_project(self.driver, Settings.project_name)
+        time.sleep(BaseSettings.click_time_wait)
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
+        self.project_exists = bool(self.driver.find_elements_by_xpath(xpath))
+        assert self.project_exists, 'Cannot create project "%s"' % Settings.project_name
+        print 'Prject was created successfully'
 
         # Create resource
         print 'Resource is going to be created.'
