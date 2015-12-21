@@ -6,14 +6,13 @@
 """
 
 
+import sys
 import time
 import unittest
-import sys
 
-
+from base import BaseSettings
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
                      delete_organization, element_exists, make_screenshot)
-from base import BaseSettings
 
 
 class Settings(object):
