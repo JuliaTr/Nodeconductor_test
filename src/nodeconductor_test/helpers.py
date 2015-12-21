@@ -104,6 +104,76 @@ def choose_organization(driver, organization):
     print '----- Organization selection process ended -----'
 
 
+def create_organization(driver, organization):
+    print '----- Organization creation process started -----'
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Go to list of organizations'
+    back_to_list_button = driver.find_element_by_class_name('back-to-list')
+    back_to_list_button.click()
+    print 'Create organization'
+    add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
+    add_organization_button.click()
+    organization_name_field = driver. find_element_by_css_selector('[ng-model="CustomerAdd.instance.name"]')
+    organization_name_field.send_keys(organization)
+    create_organization_button = driver. find_element_by_link_text('Create organization')
+    create_organization_button.click()
+    print '----- Organization creation process ended -----'
+
+
+def delete_organization(driver, organization):
+    print '----- Organization deletion process started -----'
+    go_to_main_page(driver)
+    print 'Go to organization page'
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Go to list of organizations'
+    back_to_list_button = driver.find_element_by_class_name('back-to-list')
+    back_to_list_button.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Delete organization'
+    search_field = driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
+    search_field.clear()
+    search_field.send_keys(organization)
+    time.sleep(BaseSettings.search_time_wait)
+    print 'Open organization actions'
+    force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
+    print 'Click on remove button'
+    organization_remove = driver.find_element_by_link_text('Remove')
+    organization_remove.click()
+    print 'Accept project delete confirmation popup'
+    alert = driver.switch_to_alert()
+    alert.accept()
+    print '----- Organization deletion process ended -----'
+
+
+#  Cannot top-up, issue SAAS-1070
+def top_up_organization_balance(driver, top_up_balance):
+    print '----- Top up organization balance process started -----'
+    go_to_main_page(driver)
+    print 'Go to organization page'
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Top-up balance'
+    top_up_button = driver.find_element_by_link_text('Top-up')
+    top_up_button.click()
+    add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
+    add_amount_field.clear()
+    add_amount_field.send_keys(top_up_balance)
+    add_credit_button = driver.find_element_by_link_text('Add credit')
+    add_credit_button.click()
+    print '----- Top up organization balance process started -----'
+
+
 def create_project(driver, project_name, project_description=''):
     print '----- Project creation process started -----'
     go_to_main_page(driver)
@@ -129,8 +199,8 @@ def delete_project(driver, project_name):
     projects.click()
     time.sleep(BaseSettings.click_time_wait)
     print 'Go to list of projects page'
-    back_to_list_field = driver.find_element_by_class_name('back-to-list')
-    back_to_list_field.click()
+    back_to_list_button = driver.find_element_by_class_name('back-to-list')
+    back_to_list_button.click()
     time.sleep(BaseSettings.click_time_wait)
     print 'Put project name to search field'
     project_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
