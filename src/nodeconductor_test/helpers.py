@@ -147,7 +147,7 @@ def delete_organization(driver, organization):
     print 'Click on remove button'
     organization_remove = driver.find_element_by_link_text('Remove')
     organization_remove.click()
-    print 'Accept project delete confirmation popup'
+    print 'Accept organization delete confirmation popup'
     alert = driver.switch_to_alert()
     alert.accept()
     print '----- Organization deletion process ended -----'
