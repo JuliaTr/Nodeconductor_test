@@ -21,11 +21,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider_amazon, import_resource, unlink_resource, delete_provider,
-                     element_exists, go_to_main_page, make_screenshot, get_private_parent)
+                     create_provider_digitalocean, import_resource, unlink_resource, delete_provider,
+                     element_exists, go_to_main_page, make_screenshot, get_private_parent, _search)
 from base import BaseSettings
 
-private_parent = get_private_parent('AmazonPrivateSettings')
+private_parent = get_private_parent('DOPrivateSettings')
 
 
 class Settings(BaseSettings, private_parent):
@@ -34,12 +34,12 @@ class Settings(BaseSettings, private_parent):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     organization = 'Test only org'
-    project_name = 'Amazon test project'
-    provider_type_name = 'Amazon'
-    provider_name = 'AmazonTest provider'
+    project_name = 'DO test project'
+    provider_type_name = 'DigitalOcean'
+    provider_name = 'DigitalOceanTest provider'
     category_name = 'VMs'
-    resource_name = 'old.opennodecloud.com'
-    resource_cost = '$9.67'
+    resource_name = 'SIB-test'
+    resource_cost = '$5.00'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -75,13 +75,9 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
-        create_provider_amazon(self.driver, Settings.provider_name, Settings.provider_type_name,
-                               Settings.access_key_id_name, Settings.secret_access_key_name)
-        print 'Search created provider'
-        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        search_field.clear()
-        search_field.send_keys(Settings.provider_name)
-        time.sleep(BaseSettings.search_time_wait)
+        create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
+                                     Settings.token_name)
+        _search(self.driver, Settings.provider_name)
         print 'Find provider in list'
         xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
         assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
@@ -101,11 +97,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Resource is going to be imported.'
         import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
                         Settings.resource_name)
-        print 'Search imported resource'
-        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        search_field.clear()
-        search_field.send_keys(Settings.resource_name)
-        time.sleep(BaseSettings.search_time_wait)
+        _search(self.driver, Settings.resource_name)
         print 'Go to resource page'
         resource = self.driver.find_element_by_link_text(Settings.resource_name)
         resource.click()
@@ -135,21 +127,17 @@ class NodeconductorTest(unittest.TestCase):
         resource_cost_exists = False
         for row in rows_list:
             if Settings.resource_name in row.text:
-                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" ' % Settings.resource_cost
+                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" to check cost' % Settings.resource_cost
                 resource_cost_exists = True
                 print 'Resource cost "%s" was found on page' % Settings.resource_cost
-        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" to check cost' % Settings.resource_name
+        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" ' % Settings.resource_name
         time.sleep(BaseSettings.click_time_wait)
         print '----- Cost was checked successfully----- '
 
         # Unlink resource
         print 'Resource is going to be unlinked.'
         unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
-        print 'Search imported resource'
-        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        search_field.clear()
-        search_field.send_keys(Settings.resource_name)
-        time.sleep(BaseSettings.search_time_wait)
+        _search(self.driver, Settings.resource_name)
         print 'Check unlinked resource existence'
         assert not element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.resource_name), (
             'Error: Resource with name "%s" was not unlinked, it still exists' % Settings.resource_name)
@@ -169,10 +157,7 @@ class NodeconductorTest(unittest.TestCase):
                 delete_provider(self.driver, Settings.provider_name)
                 self.provider_exists = False
                 time.sleep(BaseSettings.click_time_wait)
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.provider_name)
-                time.sleep(BaseSettings.search_time_wait)
+                _search(self.driver, Settings.provider_name)
                 assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
                     'Error: Provider with name "%s" was not deleted, it still exists' % Settings.provider_name)
                 print 'Provider was deleted successfully.'
@@ -186,10 +171,7 @@ class NodeconductorTest(unittest.TestCase):
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 time.sleep(BaseSettings.click_time_wait)
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.project_name)
-                time.sleep(BaseSettings.search_time_wait)
+                _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
                 print 'Project was deleted successfully.'

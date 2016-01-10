@@ -23,6 +23,42 @@ def get_private_parent(class_name):
     return private_parent
 
 
+def _go_to_organization_details(driver):
+    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
+    organization_field.click()
+    organization_details = driver.find_element_by_link_text('Details')
+    organization_details.click()
+    time.sleep(BaseSettings.click_time_wait)
+
+
+def _search(driver, key):
+    print 'Search by key: %s' % key
+    search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    search_field.clear()
+    search_field.send_keys(key)
+    time.sleep(BaseSettings.search_time_wait)
+
+
+def _go_to_project_page(driver, key):
+    print 'Go to project %s page' % key
+    project = driver.find_element_by_link_text(key)
+    project.click()
+    time.sleep(BaseSettings.click_time_wait)
+
+
+def _confirm_alert(driver, key):
+    print 'Accept %s delete confirmation popup' % key
+    alert = driver.switch_to_alert()
+    alert.accept()
+
+
+def _back_to_list(driver):
+    print 'Go to list'
+    back_to_list_button = driver.find_element_by_class_name('back-to-list')
+    back_to_list_button.click()
+    time.sleep(BaseSettings.click_time_wait)
+
+
 def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
@@ -106,14 +142,8 @@ def choose_organization(driver, organization):
 
 def create_organization(driver, organization):
     print '----- Organization creation process started -----'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(BaseSettings.click_time_wait)
-    print 'Go to list of organizations'
-    back_to_list_button = driver.find_element_by_class_name('back-to-list')
-    back_to_list_button.click()
+    _go_to_organization_details(driver)
+    _back_to_list(driver)
     print 'Create organization'
     add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
     add_organization_button.click()
@@ -128,14 +158,8 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(BaseSettings.click_time_wait)
-    print 'Go to list of organizations'
-    back_to_list_button = driver.find_element_by_class_name('back-to-list')
-    back_to_list_button.click()
+    _go_to_organization_details(driver)
+    _back_to_list(driver)
     time.sleep(BaseSettings.click_time_wait)
     print 'Delete organization'
     search_field = driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
@@ -147,9 +171,7 @@ def delete_organization(driver, organization):
     print 'Click on remove button'
     organization_remove = driver.find_element_by_link_text('Remove')
     organization_remove.click()
-    print 'Accept organization delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, organization)
     print '----- Organization deletion process ended -----'
 
 
@@ -158,11 +180,7 @@ def top_up_organization_balance(driver, top_up_balance):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_organization_details(driver)
     print 'Top-up balance'
     top_up_button = driver.find_element_by_link_text('Top-up')
     top_up_button.click()
@@ -194,26 +212,16 @@ def create_project(driver, project_name, project_description=''):
 def delete_project(driver, project_name):
     print '----- Project deletion process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    projects = driver.find_element_by_link_text(project_name)
-    projects.click()
+    _go_to_project_page(driver, project_name)
+    _back_to_list(driver)
     time.sleep(BaseSettings.click_time_wait)
-    print 'Go to list of projects page'
-    back_to_list_button = driver.find_element_by_class_name('back-to-list')
-    back_to_list_button.click()
-    time.sleep(BaseSettings.click_time_wait)
-    print 'Put project name to search field'
-    project_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    project_search_field.send_keys(project_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, project_name)
     print 'Open project actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
     project_remove = driver.find_element_by_link_text('Remove')
     project_remove.click()
-    print 'Accept project delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, project_name)
     print '----- Project deletion process ended -----'
 
 
@@ -260,16 +268,11 @@ def delete_ssh_key(driver, key_name, user_full_name):
     force_click(driver, css_selector='[visible="keys"]')
     print 'keys tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    print 'Put project name to search field'
-    ssh_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    ssh_search_field.send_keys(key_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, key_name)
     print 'Click on remove button'
     ssh_key_remove = driver.find_element_by_link_text('Remove')
     ssh_key_remove.click()
-    print 'Accept project delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, key_name)
     print '----- SSH key deletion process ended -----'
 
 
@@ -277,9 +280,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
                               image_name, flavor_name, public_key_name):
     print '----- Resource creation process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to vms tab'
     force_click(driver, css_selector='[visible="vms"]')
     print 'vms tab was successfully choosen'
@@ -329,9 +330,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
 # To use this function it is necessary to be already on dashboard
 def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
                           username, os_password, size_name):
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
-    # time.sleep(BaseSettings.click_time_wait)
+    _go_to_project_page(driver, project_name)
     force_click(driver, css_selector='[visible="vms"]')
     print 'vms tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
@@ -387,9 +386,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
     dashboard_field.click()
     time.sleep(5)
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
-    time.sleep(5)
+    _go_to_project_page(driver, project_name)
     vms = driver.find_element_by_css_selector('[visible="vms"]')
     vms.click()
     time.sleep(5)
@@ -441,11 +438,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
 def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_organization_details(driver)
     print 'Go to providers tab'
     force_click(driver, css_selector='[visible="providers"]')
     print 'providers tab was successfully choosen'
@@ -478,11 +471,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
 def create_provider_amazon(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_organization_details(driver)
     print 'Go to providers tab'
     force_click(driver, css_selector='[visible="providers"]')
     print 'providers tab was successfully choosen'
@@ -517,12 +506,7 @@ def create_provider_amazon(driver, provider_name, provider_type_name, access_key
 # Method isn't completed yet.
 # TODO: Add certificate.
 def create_provider_azure(driver, provider_name, provider_type_name, subscription_id_name):
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    time.sleep(5)
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
-    time.sleep(10)
+    _go_to_organization_details(driver)
     providers = driver.find_element_by_css_selector('[visible="providers"]')
     providers.click()
     time.sleep(5)
@@ -548,9 +532,7 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
 def import_resource(driver, project_name, provider_name, category_name, resource_name):
     print '----- Resource import process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to resource tab'
     force_click(driver, css_selector='[visible="vms"]')
     time.sleep(BaseSettings.click_time_wait)
@@ -581,16 +563,11 @@ def import_resource(driver, project_name, provider_name, category_name, resource
 def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to resource tab'
     force_click(driver, xpath='//li[@visible="vms"]')
     time.sleep(BaseSettings.click_time_wait)
-    print 'Put resource name to search field'
-    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_search_field.send_keys(resource_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, resource_name)
     print 'Open project actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
@@ -602,32 +579,22 @@ def unlink_resource(driver, project_name, resource_name):
 def delete_provider(driver, provider_name):
     print '----- Provider deletion process started -----'
     print 'Go to organization page'
-    organization_field = driver.find_element_by_css_selector('ul.nav-list span.customer-name')
-    organization_field.click()
-    organization_details = driver.find_element_by_link_text('Details')
-    organization_details.click()
+    _go_to_organization_details(driver)
     print 'Go to providers tab'
     force_click(driver, css_selector='[visible="providers"]')
     print 'Providers tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    print 'Put provider name to search field'
-    provider_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    provider_search_field.send_keys(provider_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, provider_name)
     print 'Click on delete button'
     force_click(driver, css_selector='[ng-class="{\'disabled\': button.isDisabled(buttonModel)}"]')
-    print 'Accept provider delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, provider_name)
     print '----- Provider deletion process ended -----'
 
 
 def create_application_group(driver, project_name, category_name, resource_type_name, path_name, application_group_name):
     print '----- Application group creation process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to applications tab'
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
@@ -664,9 +631,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
 def create_application_project(driver, project_name, category_name, resource_type_name1, application_project_name, visibility_level_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to applications tab'
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
@@ -706,49 +671,35 @@ def create_application_project(driver, project_name, category_name, resource_typ
 def delete_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to applications tab'
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    print 'Put application group name to search field'
-    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_search_field.send_keys(application_group_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, application_group_name)
     print 'Open application group actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
     remove_field = driver.find_element_by_link_text('Remove')
     remove_field.click()
-    print 'Accept application delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, application_group_name)
     print '----- Application group deletion process ended -----'
 
 
 def delete_application_project(driver, project_name, application_project_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
-    print 'Go to project page'
-    project = driver.find_element_by_link_text(project_name)
-    project.click()
+    _go_to_project_page(driver, project_name)
     print 'Go to applications tab'
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    print 'Put application project name to search field'
-    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_search_field.send_keys(application_project_name)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, application_project_name)
     print 'Open application project actions'
     actions = driver.find_element_by_link_text('actions')
     actions.click()
     print 'Click on remove button'
     remove_field = driver.find_element_by_link_text('Remove')
     remove_field.click()
-    print 'Accept application delete confirmation popup'
-    alert = driver.switch_to_alert()
-    alert.accept()
+    _confirm_alert(driver, application_project_name)
     print '----- Application project deletion process ended -----'

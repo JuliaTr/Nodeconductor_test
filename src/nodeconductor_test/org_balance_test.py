@@ -12,7 +12,7 @@ import unittest
 
 from base import BaseSettings
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
-                     delete_organization, element_exists, make_screenshot)
+                     delete_organization, element_exists, make_screenshot, _back_to_list)
 
 
 class Settings(object):
@@ -73,7 +73,7 @@ class NodeconductorTest(unittest.TestCase):
                 print 'Organization is going to be deleted.'
                 delete_organization(self.driver, Settings.organization)
                 self.organization_exists = False
-                time.sleep(BaseSettings.click_time_wait)
+                _back_to_list(self.driver)
                 print 'Existence check of deleted organization'
                 search_field = self.driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
                 search_field.clear()

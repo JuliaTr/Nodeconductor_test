@@ -19,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_application_group, element_exists, delete_application_group, create_application_project,
-                     delete_application_project, make_screenshot)
+                     delete_application_project, make_screenshot, _search)
 from base import BaseSettings
 
 
@@ -61,7 +61,7 @@ class ApplicationCreationTest(unittest.TestCase):
         choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
 
-        # Create project
+        Create project
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(BaseSettings.click_time_wait)
@@ -118,10 +118,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 print 'Application project is going to be deleted.'
                 delete_application_project(self.driver, Settings.project_name, Settings.application_project_name)
                 self.application_project_exists = False
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.application_project_name)
-                time.sleep(BaseSettings.search_time_wait)
+                _search(self.driver, Settings.application_project_name)
                 print 'Wait till application project will be deleted'
                 try:
                     WebDriverWait(self.driver, 60).until(
@@ -140,10 +137,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 print 'Application group is going to be deleted.'
                 delete_application_group(self.driver, Settings.project_name, Settings.application_group_name)
                 self.application_group_exists = False
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.application_group_name)
-                time.sleep(BaseSettings.search_time_wait)
+                _search(self.driver, Settings.application_group_name)
                 print 'Wait till application group will be deleted'
                 try:
                     WebDriverWait(self.driver, 60).until(
@@ -163,10 +157,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 time.sleep(BaseSettings.click_time_wait)
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.project_name)
-                time.sleep(BaseSettings.search_time_wait)
+                _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
                 print 'Project was deleted successfully.'
