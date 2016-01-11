@@ -61,7 +61,7 @@ class ApplicationCreationTest(unittest.TestCase):
         choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
 
-        Create project
+        # Create project
         print 'Project is going to be created.'
         create_project(self.driver, Settings.project_name)
         time.sleep(BaseSettings.click_time_wait)
@@ -92,7 +92,7 @@ class ApplicationCreationTest(unittest.TestCase):
         # Create application project
         print 'Application project is going to be created.'
         create_application_project(self.driver, Settings.project_name, Settings.category_name, Settings.resource_type_name1, Settings.application_project_name,
-                                   Settings.visibility_level_name)
+                                   Settings.visibility_level_name, Settings.application_group_name)
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.application_project_name
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create application group "%s"' % Settings.application_project_name
         self.application_project_exists = True

@@ -175,7 +175,6 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process ended -----'
 
 
-#  Cannot top-up, issue SAAS-1070
 def top_up_organization_balance(driver, top_up_balance):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
@@ -551,7 +550,7 @@ def import_resource(driver, project_name, provider_name, category_name, resource
         if provider.text == provider_name:
             provider.click()
             break
-    print 'Put resource name'
+    print 'Select resource name'
     resource = driver.find_element_by_link_text(resource_name)
     resource.click()
     print 'Click on import button'
@@ -628,7 +627,8 @@ def create_application_group(driver, project_name, category_name, resource_type_
     print '----- Application group creation process ended -----'
 
 
-def create_application_project(driver, project_name, category_name, resource_type_name1, application_project_name, visibility_level_name):
+def create_application_project(driver, project_name, category_name, resource_type_name1,
+                               application_project_name, visibility_level_name, application_group_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
@@ -653,6 +653,12 @@ def create_application_project(driver, project_name, category_name, resource_typ
             resource_type.click()
             break
     time.sleep(BaseSettings.click_time_wait)
+    print 'Group selection'
+    groups = driver.find_elements_by_class_name('appstore-template')
+    for group in groups:
+        if group.text == application_group_name:
+            group.click()
+            break
     print 'Visibility selection'
     visibility_levels = driver.find_elements_by_class_name('appstore-template')
     for visibility_level in visibility_levels:
