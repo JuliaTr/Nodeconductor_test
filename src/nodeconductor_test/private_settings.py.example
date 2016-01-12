@@ -3,5 +3,5 @@ class AmazonPrivateSettings(object):
     secret_access_key_name = 'some_access_key'
 
 
-class DOPrivateSettings(object):
+class DigitalOceanPrivateSettings(object):
     token_name = 'some_token_name'

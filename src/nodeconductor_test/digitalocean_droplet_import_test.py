@@ -25,7 +25,7 @@ from helpers import (login_nodeconductor, get_driver, create_project, delete_pro
                      element_exists, go_to_main_page, make_screenshot, get_private_parent, _search)
 from base import BaseSettings
 
-private_parent = get_private_parent('DOPrivateSettings')
+private_parent = get_private_parent('DigitalOceanPrivateSettings')
 
 
 class Settings(BaseSettings, private_parent):
