@@ -1,0 +1,7 @@
+class AmazonPrivateSettings(object):
+    access_key_id_name = 'some_key_id'
+    secret_access_key_name = 'some_access_key'
+
+
+class DOPrivateSettings(object):
+    token_name = 'some_token_name'
