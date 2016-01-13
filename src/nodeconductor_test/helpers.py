@@ -67,7 +67,7 @@ def go_to_main_page(driver):
 def make_screenshot(driver, name=None):
     if name is None:
         name = str(datetime.datetime.now()) + '.png'
-        name = name.replace(' ', '_')
+    name = name.replace(' ', '_')
     if not os.path.exists(BaseSettings.screenshots_folder):
         os.makedirs(BaseSettings.screenshots_folder)
     driver.save_screenshot(os.path.join(BaseSettings.screenshots_folder, name))
