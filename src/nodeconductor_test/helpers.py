@@ -18,8 +18,8 @@ def get_private_parent(class_name):
         # private settings is not defined. Do nothing.
         pass
     else:
-        if hasattr(private_settings, class_name):   # check if private settings is defined for Amazon
-            private_parent = getattr(private_settings, class_name)  # add Amazon settings to list of parents
+        if hasattr(private_settings, class_name):   # check if private settings is defined
+            private_parent = getattr(private_settings, class_name)  # add settings to list of parents
     return private_parent
 
 
@@ -67,6 +67,7 @@ def go_to_main_page(driver):
 def make_screenshot(driver, name=None):
     if name is None:
         name = str(datetime.datetime.now()) + '.png'
+    name = name.replace(' ', '_')
     if not os.path.exists(BaseSettings.screenshots_folder):
         os.makedirs(BaseSettings.screenshots_folder)
     driver.save_screenshot(os.path.join(BaseSettings.screenshots_folder, name))
@@ -175,7 +176,9 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process ended -----'
 
 
-def top_up_organization_balance(driver, top_up_balance):
+# Cannot complete, blocker SAAS-1101
+def top_up_organization_balance(driver, top_up_balance, card_number, expiration_month_date, first_name, last_name,
+                                expiration_year_date, csc_number, addresss_line, city_name, phone_number, email):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
@@ -188,6 +191,36 @@ def top_up_organization_balance(driver, top_up_balance):
     add_amount_field.send_keys(top_up_balance)
     add_credit_button = driver.find_element_by_link_text('Add credit')
     add_credit_button.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print 'Switch to payment process'
+    # window_before = driver.window_handles[0]
+    # window_after = driver.window_handles[1]
+    # driver.switch_to_window(window_after)
+    # print window_after
+    # for handle in driver.window_handles:
+    #     driver.switch_to.window(handle)
+    card = driver.find_elements_by_id('cc_number')
+    card.send_keys(card_number)
+    expiration_month = driver.find_elements_by_id('expdate_month')
+    expiration_month.send_keys(expiration_month_date)
+    expiration_year = driver.find_elements_by_id('expdate_year')
+    expiration_year.send_keys(expiration_year_date)
+    csc = driver.find_elements_by_id('cvv2_number')
+    csc.send_keys(csc_number)
+    name_field = driver.find_elements_by_id('first_name')
+    name_field.send_keys(first_name)
+    last_name_field = driver.find_elements_by_id('last_name')
+    last_name_field.send_keys(last_name)
+    address_field = driver.find_elements_by_id('address1')
+    address_field.send_keys(addresss_line)
+    city_field = driver.find_elements_by_id('city')
+    city_field.send_keys(city_name)
+    phone_number_field = driver.find_elements_by_id('H_PhoneNumber')
+    phone_number_field.send_keys(phone_number)
+    email_field = driver.find_elements_by_id('email-address')
+    email_field.send_keys(email)
+    continue_button = driver.find_elements_by_id('submitBilling')
+    continue_button.click()
     print '----- Top up organization balance process started -----'
 
 
