@@ -2,9 +2,11 @@
 1. Login NC
 2. Choose organization
 3. Create project
-4. Create application
-5. Delete application
-6. Delete project
+4. Create application group
+5. Create application project
+6. Delete application project
+7. Delete application group
+8. Delete project
 """
 
 
@@ -37,6 +39,8 @@ class Settings(object):
     application_group_name = 'Test group'
     visibility_level_name = 'The project can be cloned by any logged in user.'
     application_project_name = 'Test project'
+    time_wait_for_application_state = 10
+    time_wait_to_delete_application = 60
 
 
 class ApplicationCreationTest(unittest.TestCase):
@@ -80,7 +84,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print 'Application group exists: ', self.application_group_exists
         print 'Find online state of created application group'
         try:
-            WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, Settings.time_wait_for_application_state).until(
                 EC.presence_of_element_located((By.XPATH, '//dd[contains(text(), "Online")]')))
         except TimeoutException as e:
             print 'Error: Application group is not online'
@@ -99,7 +103,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print 'Application project exists: ', self.application_project_exists
         print 'Find online state of created application group'
         try:
-            WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, Settings.time_wait_for_application_state).until(
                 EC.presence_of_element_located((By.XPATH, '//dd[contains(text(), "Online")]')))
         except TimeoutException as e:
             print 'Error: Application project is not online'
@@ -121,7 +125,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 _search(self.driver, Settings.application_project_name)
                 print 'Wait till application project will be deleted'
                 try:
-                    WebDriverWait(self.driver, 60).until(
+                    WebDriverWait(self.driver, Settings.time_wait_to_delete_application).until(
                         EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % Settings.application_project_name)))
                 except TimeoutException as e:
                     print 'Error: Application project with name "%s" was not deleted, it still exists' % Settings.application_project_name
@@ -140,7 +144,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 _search(self.driver, Settings.application_group_name)
                 print 'Wait till application group will be deleted'
                 try:
-                    WebDriverWait(self.driver, 60).until(
+                    WebDriverWait(self.driver, Settings.time_wait_to_delete_application).until(
                         EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % Settings.application_group_name)))
                 except TimeoutException as e:
                     print 'Error: Application group with name "%s" was not deleted, it still exists' % Settings.application_group_name
