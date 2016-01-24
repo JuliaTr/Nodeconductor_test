@@ -40,6 +40,7 @@ class Settings(BaseSettings, private_parent):
     category_name = 'VMs'
     resource_name = 'SIB-test'
     resource_cost = '$5.00'
+    time_wait_for_provider_state = 30
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -84,7 +85,7 @@ class NodeconductorTest(unittest.TestCase):
         self.provider_exists = True
         print 'Find online state of created provider'
         try:
-            WebDriverWait(self.driver, 30).until(
+            WebDriverWait(self.driver, Settings.time_wait_for_provider_state).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.online")))
         except TimeoutException as e:
             print 'Error: Provider is not online'

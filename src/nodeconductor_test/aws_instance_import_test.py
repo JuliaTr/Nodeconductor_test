@@ -21,11 +21,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider_amazon, import_resource, unlink_resource, delete_provider, _search,
+                     create_provider_aws, import_resource, unlink_resource, delete_provider, _search,
                      element_exists, go_to_main_page, make_screenshot, get_private_parent)
 from base import BaseSettings
 
-private_parent = get_private_parent('AmazonPrivateSettings')
+private_parent = get_private_parent('AWSPrivateSettings')
 
 
 class Settings(BaseSettings, private_parent):
@@ -38,8 +38,9 @@ class Settings(BaseSettings, private_parent):
     provider_type_name = 'Amazon'
     provider_name = 'AmazonTest provider'
     category_name = 'VMs'
-    resource_name = 'old.opennodecloud.com'
-    resource_cost = '$9.67'
+    resource_name = 'docker-build-host'
+    resource_cost = '$57.29'
+    time_wait_for_provider_state = 300
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -75,8 +76,8 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
-        create_provider_amazon(self.driver, Settings.provider_name, Settings.provider_type_name,
-                               Settings.access_key_id_name, Settings.secret_access_key_name)
+        create_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
+                            Settings.access_key_id_name, Settings.secret_access_key_name)
         print 'Search created provider'
         _search(self.driver, Settings.provider_name)
         print 'Find provider in list'
@@ -85,7 +86,7 @@ class NodeconductorTest(unittest.TestCase):
         self.provider_exists = True
         print 'Find online state of created provider'
         try:
-            WebDriverWait(self.driver, 30).until(
+            WebDriverWait(self.driver, Settings.time_wait_for_provider_state).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.online")))
         except TimeoutException as e:
             print 'Error: Provider is not online'
@@ -109,9 +110,9 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = True
         print 'Resource exists: ', self.resource_exists
         print 'Check imported resource state'
-        xpath = '//dd[contains(text(), "Online")]'
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Error: Imported resource "%s" is not online.' % Settings.resource_name
-        print 'Imported resource is in online state'
+        state = '//dd[contains(text(), "Online")]|//dd[contains(text(), "Offline")]'
+        assert bool(self.driver.find_elements_by_xpath(state)), 'Error: Imported resource "%s" is not online or offline.' % Settings.resource_name
+        print 'Imported resource is in online or offline state'
         print 'Resource was imported successfully.'
 
         print '----- Cost is going to be checked----- '

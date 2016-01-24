@@ -500,7 +500,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     print '----- Provider creation process ended -----'
 
 
-def create_provider_amazon(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
+def create_provider_aws(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
@@ -509,7 +509,7 @@ def create_provider_amazon(driver, provider_name, provider_type_name, access_key
     print 'providers tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
     print 'Push button to create a provider'
-    provider_creation = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Create provider\')]]')
+    provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
     print 'To be on provider creation page'
     time.sleep(BaseSettings.click_time_wait)
@@ -670,7 +670,7 @@ def create_application_project(driver, project_name, category_name, resource_typ
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
     print 'Create an application'
-    application_creation = driver.find_element_by_xpath('//span[contains(text(), "Create")]')
+    application_creation = driver.find_element_by_link_text('Create')
     application_creation.click()
     time.sleep(BaseSettings.click_time_wait)
     print 'Category selection'
