@@ -12,10 +12,16 @@
 
 import time
 import unittest
+import sys
+
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, create_ssh_key,
                      delete_ssh_key, choose_organization, create_resource_openstack, delete_resource,
-                     element_exists)
+                     _search, element_exists, make_screenshot)
 
 from base import BaseSettings
 
@@ -74,33 +80,30 @@ class NodeconductorTest(unittest.TestCase):
         # Create ssh key
         print 'Ssh key is going to be created.'
         create_ssh_key(self.driver, Settings.user_full_name, Settings.key_name)
-        search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        search_field.clear()
-        search_field.send_keys(Settings.key_name)
-        time.sleep(BaseSettings.search_time_wait)
+        _search(self.driver, Settings.key_name)
         print 'Find key in list'
         xpath = '//span[contains(text(), "%s")]' % Settings.key_name
         assert element_exists(self.driver, xpath=xpath), 'Error: Key with name "%s" is not found' % Settings.key_name
         self.ssh_key_exists = True
         print 'Ssh key was created successfully'
 
-        # # Create resource
-        # print 'Resource is going to be created.'
-        # create_resource_openstack(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
-        #                           Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name,
-        #                           Settings.public_key_name)
-        # # # time.sleep(Settings.time_after_resource_creation)
-        # # # self.driver.refresh()
-        # # # time.sleep(10)
-        # # # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-        # # # search_field.clear()
-        # # # time.sleep(5)
-        # # # search_field.send_keys(Settings.resource_name)
-        # # # time.sleep(5)
-        # # # assert element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
-        # # #     'Error: Cannot find resource with name  %s ' % Settings.resource_name)
-        # self.resource_exists = True
-        # print 'Resource was created successfully'
+        # Create resource
+        print 'Resource is going to be created.'
+        create_resource_openstack(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
+                                  Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name,
+                                  Settings.public_key_name)
+        # time.sleep(Settings.time_after_resource_creation)
+        # self.driver.refresh()
+        # time.sleep(10)
+        # search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        # search_field.clear()
+        # time.sleep(5)
+        # search_field.send_keys(Settings.resource_name)
+        # time.sleep(5)
+        # assert element_exists(self.driver, css_selector='[ng-repeat="entity in entityList.list"]'), (
+        #     'Error: Cannot find resource with name  %s ' % Settings.resource_name)
+        self.resource_exists = True
+        print 'Resource was created successfully'
 
         # # Delete resource
         # print 'Resource is going to be deleted.'
@@ -112,48 +115,50 @@ class NodeconductorTest(unittest.TestCase):
 
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
-        if self.project_exists:
-            try:
-                # Delete project
-                print 'Project is going to be deleted.'
-                delete_project(self.driver, Settings.project_name)
-                self.project_exists = False
-                time.sleep(BaseSettings.click_time_wait)
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.project_name)
-                time.sleep(BaseSettings.search_time_wait)
-                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
-                    self.project_exists = True
-                print 'Project was deleted successfully.'
-            except Exception as e:
-                print 'Project cannot be deleted. Error: "%s"' % e
+        if sys.exc_info()[0] is not None:
+            make_screenshot(self.driver)
+        # if self.project_exists:
+        #     try:
+        #         # Delete project
+        #         print 'Project is going to be deleted.'
+        #         delete_project(self.driver, Settings.project_name)
+        #         self.project_exists = False
+        #         time.sleep(BaseSettings.click_time_wait)
+        #         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        #         search_field.clear()
+        #         search_field.send_keys(Settings.project_name)
+        #         time.sleep(BaseSettings.search_time_wait)
+        #         if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
+        #             self.project_exists = True
+        #         print 'Project was deleted successfully.'
+        #     except Exception as e:
+        #         print 'Project cannot be deleted. Error: "%s"' % e
 
-        if self.ssh_key_exists:
-            try:
-                # Delete ssh key
-                print 'Ssh key is going to be deleted.'
-                delete_ssh_key(self.driver, Settings.key_name, Settings.user_full_name)
-                self.ssh_key_exists = False
-                # time.sleep(10)
-                search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-                search_field.clear()
-                search_field.send_keys(Settings.key_name)
-                time.sleep(BaseSettings.search_time_wait)
-                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.key_name), (
-                    'Error: Ssh key with name "%s" was not deleted, it still exists' % Settings.key_name)
-                print 'Ssh key was deleted successfully.'
-            except Exception as e:
-                print 'Ssh key cannot be deleted. Error: %s' % e
+        # if self.ssh_key_exists:
+        #     try:
+        #         # Delete ssh key
+        #         print 'Ssh key is going to be deleted.'
+        #         delete_ssh_key(self.driver, Settings.key_name, Settings.user_full_name)
+        #         self.ssh_key_exists = False
+        #         # time.sleep(10)
+        #         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+        #         search_field.clear()
+        #         search_field.send_keys(Settings.key_name)
+        #         time.sleep(BaseSettings.search_time_wait)
+        #         assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.key_name), (
+        #             'Error: Ssh key with name "%s" was not deleted, it still exists' % Settings.key_name)
+        #         print 'Ssh key was deleted successfully.'
+        #     except Exception as e:
+        #         print 'Ssh key cannot be deleted. Error: %s' % e
 
-        if self.resource_exists:
-            print 'Warning! Test cannot delete resource %s. It has to be deleted manually.' % Settings.resource_name
-        if self.project_exists:
-            print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
-        if self.ssh_key_exists:
-            print 'Warning! Test cannot delete ssh key %s. It has to be deleted manually.' % Settings.key_name
+        # if self.resource_exists:
+        #     print 'Warning! Test cannot delete resource %s. It has to be deleted manually.' % Settings.resource_name
+        # if self.project_exists:
+        #     print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
+        # if self.ssh_key_exists:
+        #     print 'Warning! Test cannot delete ssh key %s. It has to be deleted manually.' % Settings.key_name
 
-        self.driver.quit()
+        # self.driver.quit()
 
 
 if __name__ == "__main__":
