@@ -12,7 +12,7 @@ import unittest
 
 from base import BaseSettings
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
-                     delete_organization, element_exists, make_screenshot, _back_to_list)
+                     delete_organization, element_exists, make_screenshot, _back_to_list, choose_organization)
 
 
 class Settings(object):
@@ -21,8 +21,10 @@ class Settings(object):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     organization = 'Test org balance'
-    top_up_balance = '100'
+    top_up_balance = '1'
     balance = '0'
+    email = 'test@opennodecloud.com'
+    password_account = 'CieWoo1s'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -40,6 +42,11 @@ class NodeconductorTest(unittest.TestCase):
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
         print '%s was loggedin successfully.' % Settings.username
 
+        # Choose organization
+        print 'Organization is going to be chosen.'
+        choose_organization(self.driver, Settings.organization)
+        print 'Organization was chosen successfully.'
+
         # # Create organization
         # print 'Organization is going to be created.'
         # create_organization(self.driver, Settings.organization)
@@ -49,17 +56,18 @@ class NodeconductorTest(unittest.TestCase):
         self.organization_exists = True
         # print 'Organization was created successfully.'
 
+        # Cannot complete, blocker SAAS-1122
         # Top-up balance
         print 'Balance is going to be topped-up.'
         print 'Check "0" balance'
         xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.balance
         print 'Top-up balance'
-        top_up_organization_balance(self.driver, Settings.top_up_balance)
-        print 'Check toped-up balance'
-        xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.top_up_balance
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.top_up_balance
-        print 'Balance was topped-up successfully.'
+        top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.email, Settings.password_account)
+        # print 'Check toped-up balance'
+        # xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.top_up_balance
+        # assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.top_up_balance
+        # print 'Balance was topped-up successfully.'
 
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'

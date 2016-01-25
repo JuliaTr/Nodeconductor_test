@@ -176,14 +176,14 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process ended -----'
 
 
-# Cannot complete, blocker SAAS-1101
-def top_up_organization_balance(driver, top_up_balance, card_number, expiration_month_date, first_name, last_name,
-                                expiration_year_date, csc_number, addresss_line, city_name, phone_number, email):
+# Cannot complete, blocker SAAS-1122
+def top_up_organization_balance(driver, top_up_balance, email, password_account):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
     _go_to_organization_details(driver)
     print 'Top-up balance'
+    time.sleep(10)
     top_up_button = driver.find_element_by_link_text('Top-up')
     top_up_button.click()
     add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
@@ -192,6 +192,7 @@ def top_up_organization_balance(driver, top_up_balance, card_number, expiration_
     add_credit_button = driver.find_element_by_link_text('Add credit')
     add_credit_button.click()
     time.sleep(BaseSettings.click_time_wait)
+    time.sleep(10)
     print 'Switch to payment process'
     # window_before = driver.window_handles[0]
     # window_after = driver.window_handles[1]
@@ -199,28 +200,16 @@ def top_up_organization_balance(driver, top_up_balance, card_number, expiration_
     # print window_after
     # for handle in driver.window_handles:
     #     driver.switch_to.window(handle)
-    card = driver.find_elements_by_id('cc_number')
-    card.send_keys(card_number)
-    expiration_month = driver.find_elements_by_id('expdate_month')
-    expiration_month.send_keys(expiration_month_date)
-    expiration_year = driver.find_elements_by_id('expdate_year')
-    expiration_year.send_keys(expiration_year_date)
-    csc = driver.find_elements_by_id('cvv2_number')
-    csc.send_keys(csc_number)
-    name_field = driver.find_elements_by_id('first_name')
-    name_field.send_keys(first_name)
-    last_name_field = driver.find_elements_by_id('last_name')
-    last_name_field.send_keys(last_name)
-    address_field = driver.find_elements_by_id('address1')
-    address_field.send_keys(addresss_line)
-    city_field = driver.find_elements_by_id('city')
-    city_field.send_keys(city_name)
-    phone_number_field = driver.find_elements_by_id('H_PhoneNumber')
-    phone_number_field.send_keys(phone_number)
-    email_field = driver.find_elements_by_id('email-address')
-    email_field.send_keys(email)
-    continue_button = driver.find_elements_by_id('submitBilling')
-    continue_button.click()
+    # email_field = driver.find_elements_by_id('email-address')
+    # email_field.send_keys(email)
+    # password_field = driver.find_elements_by_id('login_password')
+    # password_field.send_keys(password_account)
+    login_button = driver.find_elements_by_id('submitLogin')
+    login_button.click()
+    time.sleep(BaseSettings.click_time_wait)
+    # continue_button = driver.find_elements_by_id('continue_abovefold')
+    # continue_button.click()
+    # time.sleep(BaseSettings.click_time_wait)
     print '----- Top up organization balance process started -----'
 
 
