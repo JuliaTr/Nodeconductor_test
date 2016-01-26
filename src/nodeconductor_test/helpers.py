@@ -148,7 +148,7 @@ def create_organization(driver, new_organization):
     print '----- Organization creation process started -----'
     _go_to_organization_details(driver)
     _back_to_list(driver)
-    # time.sleep(5) # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
+    time.sleep(5)  # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
     print 'Create organization'
     add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
     add_organization_button.click()
@@ -196,7 +196,7 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     add_credit_button = driver.find_element_by_link_text('Add credit')
     add_credit_button.click()
     time.sleep(BaseSettings.click_time_wait)
-    # time.sleep(5)  # PayPal page loading
+    time.sleep(5)  # PayPal page loading
     print 'Switch to payment process'
     way_to_pay = driver.find_element_by_xpath('//input[@value="Pay with my PayPal account"]')
     way_to_pay.click()
