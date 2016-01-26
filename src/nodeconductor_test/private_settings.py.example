@@ -5,3 +5,8 @@ class AWSPrivateSettings(object):
 
 class DigitalOceanPrivateSettings(object):
     token_name = 'some_token_name'
+
+
+class OrganizationBalancePrivateSettings(object):
+	email = 'email_name'
+	password_account = 'some_password'

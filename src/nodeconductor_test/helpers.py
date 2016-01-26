@@ -94,18 +94,20 @@ def element_exists(driver, css_selector=None, link_text=None, xpath=None):
         return True
 
 
-def force_click(driver, css_selector=None, xpath=None, tries_left=3):
+def force_click(driver, css_selector=None, xpath=None, link_text=None, tries_left=3):
     """ Tries to get element and click on it several times. """
     try:
         if css_selector is not None:
             element = driver.find_element_by_css_selector(css_selector)
         elif xpath is not None:
             element = driver.find_element_by_xpath(xpath)
+        elif link_text is not None:
+            element = driver.find_element_by_link_text(link_text)
         element.click()
     except StaleElementReferenceException as e:
         tries_left -= 1
         if tries_left > 0:
-            force_click(driver, css_selector=css_selector, xpath=xpath, tries_left=tries_left)
+            force_click(driver, css_selector=css_selector, xpath=xpath, link_text=link_text, tries_left=tries_left)
         else:
             raise e
 
@@ -141,21 +143,24 @@ def choose_organization(driver, organization):
     print '----- Organization selection process ended -----'
 
 
-def create_organization(driver, organization):
+# Blocker NC-1112
+def create_organization(driver, new_organization):
     print '----- Organization creation process started -----'
     _go_to_organization_details(driver)
     _back_to_list(driver)
+    # time.sleep(5) # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
     print 'Create organization'
     add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
     add_organization_button.click()
     organization_name_field = driver. find_element_by_css_selector('[ng-model="CustomerAdd.instance.name"]')
-    organization_name_field.send_keys(organization)
+    organization_name_field.send_keys(new_organization)
     create_organization_button = driver. find_element_by_link_text('Create organization')
     create_organization_button.click()
     print '----- Organization creation process ended -----'
 
 
-def delete_organization(driver, organization):
+# Blocker NC-1112
+def delete_organization(driver, new_organization):
     print '----- Organization deletion process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
@@ -165,25 +170,24 @@ def delete_organization(driver, organization):
     print 'Delete organization'
     search_field = driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
     search_field.clear()
-    search_field.send_keys(organization)
+    search_field.send_keys(new_organization)
     time.sleep(BaseSettings.search_time_wait)
     print 'Open organization actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
     print 'Click on remove button'
     organization_remove = driver.find_element_by_link_text('Remove')
     organization_remove.click()
-    _confirm_alert(driver, organization)
+    _confirm_alert(driver, new_organization)
     print '----- Organization deletion process ended -----'
 
 
-# Cannot complete, blocker SAAS-1122
 def top_up_organization_balance(driver, top_up_balance, email, password_account):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
     _go_to_organization_details(driver)
     print 'Top-up balance'
-    time.sleep(10)
+    time.sleep(5)   # because of alert over the button
     top_up_button = driver.find_element_by_link_text('Top-up')
     top_up_button.click()
     add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
@@ -192,25 +196,24 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     add_credit_button = driver.find_element_by_link_text('Add credit')
     add_credit_button.click()
     time.sleep(BaseSettings.click_time_wait)
-    time.sleep(10)
+    # time.sleep(5)  # PayPal page loading
     print 'Switch to payment process'
-    # window_before = driver.window_handles[0]
-    # window_after = driver.window_handles[1]
-    # driver.switch_to_window(window_after)
-    # print window_after
-    # for handle in driver.window_handles:
-    #     driver.switch_to.window(handle)
-    # email_field = driver.find_elements_by_id('email-address')
-    # email_field.send_keys(email)
-    # password_field = driver.find_elements_by_id('login_password')
-    # password_field.send_keys(password_account)
-    login_button = driver.find_elements_by_id('submitLogin')
+    way_to_pay = driver.find_element_by_xpath('//input[@value="Pay with my PayPal account"]')
+    way_to_pay.click()
+    time.sleep(BaseSettings.click_time_wait)
+    email_field = driver.find_element_by_id('login_email')
+    email_field.clear()
+    email_field.send_keys(email)
+    password_field = driver.find_element_by_id('login_password')
+    password_field.clear()
+    password_field.send_keys(password_account)
+    login_button = driver.find_element_by_id('submitLogin')
     login_button.click()
     time.sleep(BaseSettings.click_time_wait)
-    # continue_button = driver.find_elements_by_id('continue_abovefold')
-    # continue_button.click()
-    # time.sleep(BaseSettings.click_time_wait)
-    print '----- Top up organization balance process started -----'
+    continue_button = driver.find_element_by_id('continue_abovefold')
+    continue_button.click()
+    time.sleep(BaseSettings.click_time_wait)
+    print '----- Top up organization balance process ended -----'
 
 
 def create_project(driver, project_name, project_description=''):
