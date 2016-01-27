@@ -3,7 +3,10 @@ import os
 import time
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 import urlparse
 
@@ -57,6 +60,14 @@ def _back_to_list(driver):
     back_to_list_button = driver.find_element_by_class_name('back-to-list')
     back_to_list_button.click()
     time.sleep(BaseSettings.click_time_wait)
+
+
+def _remove_action(driver):
+    print 'Select remove action'
+    actions = driver.find_element_by_link_text('actions')
+    actions.click()
+    remove_field = driver.find_element_by_link_text('Remove')
+    remove_field.click()
 
 
 def go_to_main_page(driver):
@@ -309,6 +320,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
     print 'Create a resource'
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
+    time.sleep(BaseSettings.click_time_wait)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -402,58 +414,44 @@ def create_resource_azure(driver, project_name, resource_name, category_name, pr
     purchase.click()
 
 
-def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping,
-                    time_wait_after_resource_removal):
-    dashboard_field = driver.find_element_by_css_selector('[ui-sref="dashboard.index"]')
-    dashboard_field.click()
-    time.sleep(5)
+def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping):
+    print '----- Resource deletion process started -----'
+    go_to_main_page(driver)
+    print 'Go to project page'
     _go_to_project_page(driver, project_name)
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
-    time.sleep(5)
-    resource_search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_search_field.send_keys(resource_name)
-    time.sleep(5)
-    resource_list = driver.find_elements_by_class_name('list-box')
-    for resource in resource_list:
-        assert 'Online' in resource.text, 'Error: cannot stop resource that is not online or does not exist'
-    time.sleep(5)
+    print 'Go to vms tab'
+    force_click(driver, css_selector='[visible="vms"]')
+    print 'Search resource in the list'
+    _search(driver, resource_name)
+    print 'Check online state existence of the resource'
+    xpath = '//a[@class="status-circle online"]'
+    assert element_exists(driver, xpath=xpath), (
+        'Error: cannot stop resource "%s" that is not online or does not exist' % resource_name)
+    print 'Stop resource'
     actions = driver.find_element_by_link_text('actions')
     actions.click()
     stop_field = driver.find_element_by_link_text('Stop')
     stop_field.click()
-    time.sleep(time_wait_after_resource_stopping)
-    driver.refresh()
-    time.sleep(5)
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
-    time.sleep(5)
-    resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_field.send_keys(resource_name)
-    time.sleep(5)
-    resource_list = driver.find_elements_by_class_name('list-box')
-    for state in resource_list:
-        assert 'Offline' in state.text, ('Error: cannot delete resource that is not offline, '
-                                         'was not stopped, or does not exist')
-    time.sleep(5)
-    actions = driver.find_element_by_link_text('actions')
-    actions.click()
-    remove_field = driver.find_element_by_link_text('Remove')
-    remove_field.click()
-    alert = driver.switch_to_alert()
-    alert.accept()
-    time.sleep(time_wait_after_resource_removal)
-    driver.refresh()
-    time.sleep(5)
-    vms = driver.find_element_by_css_selector('[visible="vms"]')
-    vms.click()
-    time.sleep(5)
-    resource_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
-    resource_field.send_keys(resource_name)
-    time.sleep(5)
-    resource_list = driver.find_elements_by_class_name('list-box')
-    for resource in resource_list:
-        assert resource_name not in resource.text, 'Error: resource was not deleted, it still exists'
+    print 'Wait for stop of created resource'
+    try:
+        WebDriverWait(driver, time_wait_after_resource_stopping).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.offline")))
+    except TimeoutException as e:
+        print 'Error: Resource was not stopped'
+        raise e
+    else:
+        print 'Resource is stopped'
+    print 'Go to vms tab'
+    force_click(driver, css_selector='[visible="vms"]')
+    print 'Search resource in the list'
+    _search(driver, resource_name)
+    xpath = '//a[@class="status-circle offline"]'
+    assert element_exists(driver, xpath=xpath), (
+        'Error: cannot delete resource "%s" that is not offline, was not stopped,'
+        'or does not exist' % resource_name)
+    _remove_action(driver)
+    _confirm_alert(driver, resource_name)
+    print '----- Resource deletion process ended -----'
 
 
 def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
@@ -705,11 +703,7 @@ def delete_application_group(driver, project_name, application_group_name):
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
     _search(driver, application_group_name)
-    print 'Open application group actions'
-    force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
-    print 'Click on remove button'
-    remove_field = driver.find_element_by_link_text('Remove')
-    remove_field.click()
+    _remove_action(driver)
     _confirm_alert(driver, application_group_name)
     print '----- Application group deletion process ended -----'
 
@@ -723,11 +717,6 @@ def delete_application_project(driver, project_name, application_project_name):
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
     _search(driver, application_project_name)
-    print 'Open application project actions'
-    actions = driver.find_element_by_link_text('actions')
-    actions.click()
-    print 'Click on remove button'
-    remove_field = driver.find_element_by_link_text('Remove')
-    remove_field.click()
+    _remove_action(driver)
     _confirm_alert(driver, application_project_name)
     print '----- Application project deletion process ended -----'
