@@ -8,5 +8,5 @@ class DigitalOceanPrivateSettings(object):
 
 
 class OrganizationBalancePrivateSettings(object):
-	email = 'email_name'
-	password_account = 'some_password'
+    email = 'email_name'
+    password_account = 'some_password'
