@@ -9,6 +9,7 @@
 8. Delete project
 """
 
+# Test is not ready yet. It was postponed.
 
 import time
 import unittest

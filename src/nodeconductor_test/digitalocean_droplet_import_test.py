@@ -72,6 +72,7 @@ class NodeconductorTest(unittest.TestCase):
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create project "%s"' % Settings.project_name
         self.project_exists = True
+        print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
         # Create provider
@@ -83,6 +84,7 @@ class NodeconductorTest(unittest.TestCase):
         xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
         assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
         self.provider_exists = True
+        print 'Provider exists: ', self.provider_exists
         print 'Find online state of created provider'
         try:
             WebDriverWait(self.driver, Settings.time_wait_for_provider_state).until(
@@ -91,7 +93,7 @@ class NodeconductorTest(unittest.TestCase):
             print 'Error: Provider is not online'
             raise e
         else:
-            print 'Provider is in online status'
+            print 'Provider is in online state'
         print 'Provider was created successfully.'
 
         # Import resource
@@ -109,7 +111,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = True
         print 'Resource exists: ', self.resource_exists
         print 'Check imported resource state'
-        xpath = '//dd[contains(text(), "Online")]'
+        xpath = '//div[contains(text(), "Online")]'
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Error: Imported resource "%s" is not online.' % Settings.resource_name
         print 'Imported resource is in online state'
         print 'Resource was imported successfully.'
@@ -123,7 +125,7 @@ class NodeconductorTest(unittest.TestCase):
         resources_list = self.driver.find_element_by_css_selector('[ng-class="{\'active\': row.selected && row.activeTab==\'resources\'}"]')
         resources_list.click()
         time.sleep(BaseSettings.click_time_wait)
-        print 'Find row with the resource in a resource table'
+        print 'Find row with the resource in a resource list'
         rows_list = self.driver.find_elements_by_css_selector('[ng-repeat="resource in row.resources"]')
         resource_cost_exists = False
         for row in rows_list:
@@ -157,6 +159,7 @@ class NodeconductorTest(unittest.TestCase):
                 print 'Provider is going to be deleted.'
                 delete_provider(self.driver, Settings.provider_name)
                 self.provider_exists = False
+                print 'Provider exists: ', self.provider_exists
                 time.sleep(BaseSettings.click_time_wait)
                 _search(self.driver, Settings.provider_name)
                 assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
@@ -175,6 +178,7 @@ class NodeconductorTest(unittest.TestCase):
                 _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
+                    print 'Project exists: ', self.project_exists
                 print 'Project was deleted successfully.'
             except Exception as e:
                 print 'Project cannot be deleted. Error: "%s"' % e

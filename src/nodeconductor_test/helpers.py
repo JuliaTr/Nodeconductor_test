@@ -34,9 +34,9 @@ def _go_to_organization_details(driver):
     time.sleep(BaseSettings.click_time_wait)
 
 
-def _search(driver, key):
+def _search(driver, key, css_selector='[ng-model="generalSearch"]'):
     print 'Search by key: %s' % key
-    search_field = driver.find_element_by_css_selector('[ng-model="generalSearch"]')
+    search_field = driver.find_element_by_css_selector(css_selector)
     search_field.clear()
     search_field.send_keys(key)
     time.sleep(BaseSettings.search_time_wait)
@@ -73,6 +73,7 @@ def _remove_action(driver):
 def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
+    time.sleep(BaseSettings.click_time_wait)  # organization page isn't downloaded at once.
 
 
 def make_screenshot(driver, name=None):
@@ -154,41 +155,32 @@ def choose_organization(driver, organization):
     print '----- Organization selection process ended -----'
 
 
-# Blocker NC-1112
-def create_organization(driver, new_organization):
+def create_organization(driver, organization):
     print '----- Organization creation process started -----'
     _go_to_organization_details(driver)
     _back_to_list(driver)
-    time.sleep(5)  # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
+    # time.sleep(20)  # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
     print 'Create organization'
     add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
     add_organization_button.click()
     organization_name_field = driver. find_element_by_css_selector('[ng-model="CustomerAdd.instance.name"]')
-    organization_name_field.send_keys(new_organization)
+    organization_name_field.send_keys(organization)
     create_organization_button = driver. find_element_by_link_text('Create organization')
     create_organization_button.click()
     print '----- Organization creation process ended -----'
 
 
-# Blocker NC-1112
-def delete_organization(driver, new_organization):
+def delete_organization(driver, organization):
     print '----- Organization deletion process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _back_to_list(driver)
-    time.sleep(BaseSettings.click_time_wait)
     print 'Delete organization'
-    search_field = driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
-    search_field.clear()
-    search_field.send_keys(new_organization)
-    time.sleep(BaseSettings.search_time_wait)
+    _search(driver, organization, css_selector='[ng-model="entityList.searchInput"]')
     print 'Open organization actions'
-    force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
-    print 'Click on remove button'
-    organization_remove = driver.find_element_by_link_text('Remove')
-    organization_remove.click()
-    _confirm_alert(driver, new_organization)
+    _remove_action(driver)
+    _confirm_alert(driver, organization)
     print '----- Organization deletion process ended -----'
 
 
@@ -207,7 +199,7 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     add_credit_button = driver.find_element_by_link_text('Add credit')
     add_credit_button.click()
     time.sleep(BaseSettings.click_time_wait)
-    time.sleep(5)  # PayPal page loading
+    time.sleep(10)  # PayPal page loading
     print 'Switch to payment process'
     way_to_pay = driver.find_element_by_xpath('//input[@value="Pay with my PayPal account"]')
     way_to_pay.click()
@@ -223,7 +215,6 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     time.sleep(BaseSettings.click_time_wait)
     continue_button = driver.find_element_by_id('continue_abovefold')
     continue_button.click()
-    time.sleep(BaseSettings.click_time_wait)
     print '----- Top up organization balance process ended -----'
 
 
@@ -574,6 +565,7 @@ def import_resource(driver, project_name, provider_name, category_name, resource
             provider.click()
             break
     print 'Select resource name'
+    time.sleep(BaseSettings.click_time_wait)
     resource = driver.find_element_by_link_text(resource_name)
     resource.click()
     print 'Click on import button'

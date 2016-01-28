@@ -5,13 +5,12 @@
 4. Delete organization
 """
 
-
-import sys
 import time
 import unittest
+import sys
 
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
-                     delete_organization, element_exists, make_screenshot, _back_to_list, choose_organization,
+                     delete_organization, element_exists, make_screenshot, _back_to_list, _search,
                      get_private_parent)
 from base import BaseSettings
 
@@ -23,8 +22,7 @@ class Settings(BaseSettings, private_parent):
     username = 'Alice'
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
-    organization = 'Test org balance1'
-    new_organization = 'Test org balance2'  # should be only one organization. Blocker NC-1112
+    organization = 'Test org balance'
     balance = '$0.00'
     top_up_balance = '100'
     check_balance = '$100.00'
@@ -37,7 +35,7 @@ class NodeconductorTest(unittest.TestCase):
         self.organization_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_provider_resource(self):
+    def test_organization_balance(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -45,29 +43,25 @@ class NodeconductorTest(unittest.TestCase):
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
         print '%s was logged in successfully.' % Settings.username
 
-        # Test should work without this method. Blocker NC-1112
-        # Choose organization
-        print 'Organization is going to be chosen.'
-        choose_organization(self.driver, Settings.organization)
-        print 'Organization was chosen successfully.'
-
         # Create organization
         print 'Organization is going to be created.'
-        create_organization(self.driver, Settings.new_organization)
+        time.sleep(BaseSettings.click_time_wait)
+        create_organization(self.driver, Settings.organization)
         print 'Existence check of created organization'
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.new_organization
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create organization "%s"' % Settings.new_organization
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.organization
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create organization "%s"' % Settings.organization
         self.organization_exists = True
+        print 'Organization exists: ', self.organization_exists
         print 'Organization was created successfully.'
 
         # Top-up balance
         print 'Balance is going to be topped-up.'
-        # Blocker NC-1112
-        print 'Check "$0" balance'
+        print 'Check "$0.00" balance'
         xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.balance
         print 'Top-up balance'
         top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.email, Settings.password_account)
+        time.sleep(BaseSettings.click_time_wait)
         print 'Check topped-up balance'
         xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.check_balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.check_balance
@@ -82,22 +76,20 @@ class NodeconductorTest(unittest.TestCase):
             try:
                 # Delete organization
                 print 'Organization is going to be deleted.'
-                delete_organization(self.driver, Settings.new_organization)
+                delete_organization(self.driver, Settings.organization)
                 self.organization_exists = False
+                print 'Organization exists: ', self.organization_exists
                 _back_to_list(self.driver)
                 print 'Existence check of deleted organization'
-                search_field = self.driver.find_element_by_css_selector('[ng-change="entityList.search()"]')
-                search_field.clear()
-                search_field.send_keys(Settings.new_organization)
-                time.sleep(BaseSettings.search_time_wait)
-                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.new_organization), (
-                    'Error: Organization with name "%s" was not deleted, it still exists' % Settings.new_organization)
+                _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')
+                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.organization), (
+                    'Error: Organization with name "%s" was not deleted, it still exists' % Settings.organization)
                 print 'Organization was deleted successfully.'
             except Exception as e:
                 print 'Organization cannot be deleted. Error: "%s"' % e
 
         if self.organization_exists:
-            print 'Warning! Test cannot delete organization "%s". It has to be deleted manually.' % Settings.new_organization
+            print 'Warning! Test cannot delete organization "%s". It has to be deleted manually.' % Settings.organization
 
         self.driver.quit()
 
