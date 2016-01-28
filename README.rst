@@ -16,14 +16,10 @@ Running a single test:
 
 .. code:: sh
 
-python src/nodeconductor_tests/<test_name>.py
-
-::
+    python src/nodeconductor_tests/<test_name>.py
 
 Running all tests:
 
 .. code:: sh
 
-python src/nodeconductor_tests/all_tests.py
-
-::
+    python src/nodeconductor_tests/all_tests.py
