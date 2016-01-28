@@ -6,5 +6,5 @@ project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(
 class BaseSettings(object):
     click_time_wait = 3  # time between normal user clicks
     search_time_wait = 8  # time for search
-    implicitly_wait = 20  # time to wait for element appears on the page
+    implicitly_wait = 30  # time to wait for element appears on the page
     screenshots_folder = os.path.join(project_path, 'screenshots')

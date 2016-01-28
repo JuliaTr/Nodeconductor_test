@@ -9,6 +9,7 @@
 8. Delete project
 """
 
+# Test is not ready yet. It was postponed.
 
 import time
 import unittest
@@ -40,7 +41,6 @@ class Settings(object):
     time_wait_after_resource_removal = 30
 
 
-# Test is not ready because it's impossible to test resource deletion.
 # Share Azure has disappeared.
 # TODO: Add method of provider creation and deletion.
 class AzureResourceCreationTest(unittest.TestCase):
