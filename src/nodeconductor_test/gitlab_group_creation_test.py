@@ -54,11 +54,11 @@ class ApplicationCreationTest(unittest.TestCase):
 
     def test_create_delete_application(self):
         # Login NC
-        print '%s is going to be loggedin.' % Settings.username
+        print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
         username_idt_field = self.driver.find_element_by_class_name('user-name')
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
-        print '%s was loggedin successfully.' % Settings.username
+        print '%s was logged in successfully.' % Settings.username
 
         # Choose organization
         print 'Organization is going to be chosen.'
@@ -173,7 +173,7 @@ class ApplicationCreationTest(unittest.TestCase):
         if self.application_group_exists:
             print 'Warning! Test cannot delete application group %s. It has to be deleted manually.' % Settings.application_group_name
         if self.project_exists:
-            print 'Warning! Test cannot delete project %s. It has to be delete manually.' % Settings.project_name
+            print 'Warning! Test cannot delete project %s. It has to be deleted manually.' % Settings.project_name
 
         self.driver.quit()
 
