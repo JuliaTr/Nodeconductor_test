@@ -54,11 +54,11 @@ class NodeconductorTest(unittest.TestCase):
 
     def test_create_delete_project_provider_resource(self):
         # Login NC
-        print '%s is going to be loggedin.' % Settings.username
+        print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
         username_idt_field = self.driver.find_element_by_class_name('user-name')
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
-        print '%s was loggedin successfully.' % Settings.username
+        print '%s was logged in successfully.' % Settings.username
 
         # Choose organization
         print 'Organization is going to be chosen.'
@@ -202,10 +202,14 @@ class NodeconductorTest(unittest.TestCase):
         if self.provider_exists:
             print 'Warning! Test cannot delete provider "%s". It has to be deleted manually.' % Settings.provider_name
         if self.project_exists:
-            print 'Warning! Test cannot delete project "%s". It has to be delete manually.' % Settings.project_name
+            print 'Warning! Test cannot delete project "%s". It has to be deleted manually.' % Settings.project_name
 
         self.driver.quit()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    try:
+        import xmlrunner
+        unittest.main(testRunner=xmlrunner.XMLTestRunner(output=Settings.test_reports_dir))
+    except ImportError as e:
+        unittest.main()

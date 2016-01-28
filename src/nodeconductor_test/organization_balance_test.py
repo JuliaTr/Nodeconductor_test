@@ -37,11 +37,11 @@ class NodeconductorTest(unittest.TestCase):
 
     def test_organization_balance(self):
         # Login NC
-        print '%s is going to be loggedin.' % Settings.username
+        print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
         username_idt_field = self.driver.find_element_by_class_name('user-name')
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
-        print '%s was loggedin successfully.' % Settings.username
+        print '%s was logged in successfully.' % Settings.username
 
         # Create organization
         print 'Organization is going to be created.'
@@ -89,10 +89,14 @@ class NodeconductorTest(unittest.TestCase):
                 print 'Organization cannot be deleted. Error: "%s"' % e
 
         if self.organization_exists:
-            print 'Warning! Test cannot delete organization "%s". It has to be delete manually.' % Settings.organization
+            print 'Warning! Test cannot delete organization "%s". It has to be deleted manually.' % Settings.organization
 
         self.driver.quit()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    try:
+        import xmlrunner
+        unittest.main(testRunner=xmlrunner.XMLTestRunner(output=Settings.test_reports_dir))
+    except ImportError as e:
+        unittest.main()
