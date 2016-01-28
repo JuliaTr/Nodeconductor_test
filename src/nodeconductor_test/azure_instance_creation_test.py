@@ -22,7 +22,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-class Settings(object):
+class Settings(BaseSettings):
     site_url = "http://web-test.nodeconductor.com"
     username = 'Alice'
     password = 'Alice'
@@ -138,4 +138,8 @@ class AzureResourceCreationTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    try:
+        import xmlrunner
+        unittest.main(testRunner=xmlrunner.XMLTestRunner(output=Settings.test_reports_dir))
+    except ImportError as e:
+        unittest.main()

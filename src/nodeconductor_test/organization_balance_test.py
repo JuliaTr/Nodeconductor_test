@@ -103,4 +103,8 @@ class NodeconductorTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    try:
+        import xmlrunner
+        unittest.main(testRunner=xmlrunner.XMLTestRunner(output=Settings.test_reports_dir))
+    except ImportError as e:
+        unittest.main()

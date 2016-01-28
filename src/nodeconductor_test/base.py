@@ -8,3 +8,4 @@ class BaseSettings(object):
     search_time_wait = 8  # time for search
     implicitly_wait = 20  # time to wait for element appears on the page
     screenshots_folder = os.path.join(project_path, 'screenshots')
+    test_reports_dir = os.path.join(project_path, 'test_reports')
