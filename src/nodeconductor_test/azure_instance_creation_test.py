@@ -41,6 +41,7 @@ class Settings(object):
 
 
 # Test is not ready because it's impossible to test resource deletion.
+# Share Azure has disappeared.
 # TODO: Add method of provider creation and deletion.
 class AzureResourceCreationTest(unittest.TestCase):
 
