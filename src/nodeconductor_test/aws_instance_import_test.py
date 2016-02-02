@@ -39,8 +39,8 @@ class Settings(BaseSettings, private_parent):
     provider_name = 'AmazonTest provider'
     category_name = 'VMs'
     resource_name = 'docker-build-host'
-    resource_cost = '$57.29'
-    time_wait_for_provider_state = 300
+    resource_cost = '$53.59'
+    time_wait_for_provider_state = 420
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -52,7 +52,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_provider_resource(self):
+    def test_create_delete_project_provider_import_unlink_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -75,8 +75,10 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
+        # SAAS-1120
         # Create provider
         print 'Provider is going to be created.'
+        time.sleep(BaseSettings.click_time_wait)
         create_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
                             Settings.access_key_id_name, Settings.secret_access_key_name)
         print 'Search created provider'

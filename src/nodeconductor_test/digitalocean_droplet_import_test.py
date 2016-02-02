@@ -52,7 +52,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_provider_resource(self):
+    def test_create_delete_project_provider_import_unlink_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -77,6 +77,7 @@ class NodeconductorTest(unittest.TestCase):
 
         # Create provider
         print 'Provider is going to be created.'
+        time.sleep(BaseSettings.click_time_wait)
         create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
                                      Settings.token_name)
         _search(self.driver, Settings.provider_name)

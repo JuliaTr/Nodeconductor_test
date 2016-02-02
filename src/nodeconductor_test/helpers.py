@@ -126,8 +126,11 @@ def force_click(driver, css_selector=None, xpath=None, link_text=None, tries_lef
 
 def get_driver(site_url):
     driver = webdriver.Firefox()
-    # driver.set_window_size(420, 580) # to test mobile version
-    driver.maximize_window()  # to test mobile version comment this line
+    # Tests should run on 1024x768 resolution until agreed otherwise.
+    # If changing these numbers make sure to change screen size in Jenkins job configuration.
+    # Use 420x580 resolution to test mobile version (work in progress).
+    # TODO: read resolution value from method parameters or configuration file.
+    driver.set_window_size(1366, 768)
     driver.get(site_url)
     return driver
 
@@ -302,6 +305,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
     print '----- SSH key deletion process ended -----'
 
 
+# Blocker SAAS-1141
 def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
                               image_name, flavor_name, public_key_name):
     print '----- Resource creation process started -----'
@@ -318,7 +322,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
-        if category.text == category_name:
+        if category_name in category.text:
             category.click()
             break
     print 'Provider selection'
@@ -481,6 +485,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     print '----- Provider creation process ended -----'
 
 
+# SAAS-1120
 def create_provider_aws(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
@@ -489,6 +494,7 @@ def create_provider_aws(driver, provider_name, provider_type_name, access_key_id
     force_click(driver, css_selector='[visible="providers"]')
     print 'providers tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
+    time.sleep(3)  # sometimes click isn't executed without additional time click. There is no problem using the button manually
     print 'Push button to create a provider'
     provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
@@ -566,6 +572,7 @@ def import_resource(driver, project_name, provider_name, category_name, resource
             break
     print 'Select resource name'
     time.sleep(BaseSettings.click_time_wait)
+    time.sleep(7)  # cannot find resource to import
     resource = driver.find_element_by_link_text(resource_name)
     resource.click()
     print 'Click on import button'
@@ -579,7 +586,7 @@ def unlink_resource(driver, project_name, resource_name):
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     print 'Go to resource tab'
-    force_click(driver, xpath='//li[@visible="vms"]')
+    force_click(driver, css_selector='[visible="vms"]')
     time.sleep(BaseSettings.click_time_wait)
     _search(driver, resource_name)
     print 'Open project actions'
@@ -613,6 +620,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
+    time.sleep(3)  #  create button isn't selected without additional time wait
     print 'Create an application'
     application_creation = driver.find_element_by_link_text('Create')
     application_creation.click()
