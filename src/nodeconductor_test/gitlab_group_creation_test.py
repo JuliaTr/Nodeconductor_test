@@ -72,6 +72,7 @@ class ApplicationCreationTest(unittest.TestCase):
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create project "%s"' % Settings.project_name
         self.project_exists = True
+        print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
         # Create application group
@@ -85,7 +86,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print 'Find online state of created application group'
         try:
             WebDriverWait(self.driver, Settings.time_wait_for_application_state).until(
-                EC.presence_of_element_located((By.XPATH, '//dd[contains(text(), "Online")]')))
+                EC.presence_of_element_located((By.XPATH, '//div[contains(text(), "Online")]')))
         except TimeoutException as e:
             print 'Error: Application group is not online'
             raise e
@@ -104,7 +105,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print 'Find online state of created application group'
         try:
             WebDriverWait(self.driver, Settings.time_wait_for_application_state).until(
-                EC.presence_of_element_located((By.XPATH, '//dd[contains(text(), "Online")]')))
+                EC.presence_of_element_located((By.XPATH, '//div[contains(text(), "Online")]')))
         except TimeoutException as e:
             print 'Error: Application project is not online'
             raise e
@@ -122,6 +123,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 print 'Application project is going to be deleted.'
                 delete_application_project(self.driver, Settings.project_name, Settings.application_project_name)
                 self.application_project_exists = False
+                print 'Application project exists: ', self.application_project_exists
                 _search(self.driver, Settings.application_project_name)
                 print 'Wait till application project will be deleted'
                 try:
@@ -141,6 +143,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 print 'Application group is going to be deleted.'
                 delete_application_group(self.driver, Settings.project_name, Settings.application_group_name)
                 self.application_group_exists = False
+                print 'Application group exists: ', self.application_group_exists
                 _search(self.driver, Settings.application_group_name)
                 print 'Wait till application group will be deleted'
                 try:
@@ -160,6 +163,7 @@ class ApplicationCreationTest(unittest.TestCase):
                 print 'Project is going to be deleted.'
                 delete_project(self.driver, Settings.project_name)
                 self.project_exists = False
+                print 'Project exists: ', self.project_exists
                 time.sleep(BaseSettings.click_time_wait)
                 _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
