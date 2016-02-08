@@ -34,7 +34,7 @@ def _go_to_organization_details(driver):
     time.sleep(BaseSettings.click_time_wait)
 
 
-def _search(driver, key, css_selector='[ng-model="generalSearch"]'):
+def _search(driver, key, css_selector='[ng-model="controller.generalSearch"]'):
     print 'Search by key: %s' % key
     search_field = driver.find_element_by_css_selector(css_selector)
     search_field.clear()
@@ -80,6 +80,7 @@ def make_screenshot(driver, name=None):
     if name is None:
         name = str(datetime.datetime.now()) + '.png'
     name = name.replace(' ', '_')
+    print "Make screenshot with name " + name
     if not os.path.exists(BaseSettings.screenshots_folder):
         os.makedirs(BaseSettings.screenshots_folder)
     driver.save_screenshot(os.path.join(BaseSettings.screenshots_folder, name))
@@ -177,6 +178,7 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
+    time.sleep(BaseSettings.click_time_wait)
     _go_to_organization_details(driver)
     _back_to_list(driver)
     print 'Delete organization'
@@ -190,16 +192,14 @@ def delete_organization(driver, organization):
 def top_up_organization_balance(driver, top_up_balance, email, password_account):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
-    print 'Go to organization page'
-    _go_to_organization_details(driver)
     print 'Top-up balance'
-    time.sleep(5)   # because of alert over the button
-    top_up_button = driver.find_element_by_link_text('Top-up')
-    top_up_button.click()
+    time.sleep(7)   # because of alert over the button
+    balance_button = driver.find_element_by_css_selector('i.fa-credit-card')
+    balance_button.click()
     add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
     add_amount_field.clear()
     add_amount_field.send_keys(top_up_balance)
-    add_credit_button = driver.find_element_by_link_text('Add credit')
+    add_credit_button = driver.find_element_by_css_selector('[submit-button="addCredit(amount)"]')
     add_credit_button.click()
     time.sleep(BaseSettings.click_time_wait)
     time.sleep(10)  # PayPal page loading
@@ -620,7 +620,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    time.sleep(3)  #  create button isn't selected without additional time wait
+    time.sleep(3)  # create button isn't selected without additional time wait
     print 'Create an application'
     application_creation = driver.find_element_by_link_text('Create')
     application_creation.click()

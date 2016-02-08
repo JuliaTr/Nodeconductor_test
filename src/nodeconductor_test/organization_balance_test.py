@@ -11,7 +11,7 @@ import sys
 
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
                      delete_organization, element_exists, make_screenshot, _back_to_list, _search,
-                     get_private_parent)
+                     get_private_parent, choose_organization, go_to_main_page)
 from base import BaseSettings
 
 private_parent = get_private_parent('OrganizationBalancePrivateSettings')
@@ -31,6 +31,7 @@ class Settings(BaseSettings, private_parent):
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
+        sys.exc_clear()
         self.driver = get_driver(Settings.site_url)
         self.organization_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
@@ -54,16 +55,22 @@ class NodeconductorTest(unittest.TestCase):
         print 'Organization exists: ', self.organization_exists
         print 'Organization was created successfully.'
 
+        # Choose organization
+        print 'Organization is going to be chosen.'
+        go_to_main_page(self.driver)
+        choose_organization(self.driver, Settings.organization)
+        print 'Organization was chosen successfully.'
+
         # Top-up balance
         print 'Balance is going to be topped-up.'
         print 'Check "$0.00" balance'
-        xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.balance
+        xpath = '//div[contains(text(), "%s")]' % Settings.balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.balance
         print 'Top-up balance'
         top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.email, Settings.password_account)
         time.sleep(BaseSettings.click_time_wait)
         print 'Check topped-up balance'
-        xpath = '//span[@visible="balance" and contains(text(), "%s")]' % Settings.check_balance
+        xpath = '//div[contains(text(), "%s")]' % Settings.check_balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.check_balance
         print 'Balance was topped-up successfully.'
 
@@ -79,6 +86,7 @@ class NodeconductorTest(unittest.TestCase):
                 delete_organization(self.driver, Settings.organization)
                 self.organization_exists = False
                 print 'Organization exists: ', self.organization_exists
+                time.sleep(BaseSettings.click_time_wait)
                 _back_to_list(self.driver)
                 print 'Existence check of deleted organization'
                 _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')
