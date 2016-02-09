@@ -46,6 +46,7 @@ class Settings(BaseSettings, private_parent):
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
+        sys.exc_clear()
         self.driver = get_driver(Settings.site_url)
         self.project_exists = False
         self.provider_exists = False
@@ -86,15 +87,15 @@ class NodeconductorTest(unittest.TestCase):
         assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
         self.provider_exists = True
         print 'Provider exists: ', self.provider_exists
-        print 'Find online state of created provider'
+        print 'Find In Sync state of created provider'
         try:
             WebDriverWait(self.driver, Settings.time_wait_for_provider_state).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.online")))
         except TimeoutException as e:
-            print 'Error: Provider is not online'
+            print 'Error: Provider is not In Sync'
             raise e
         else:
-            print 'Provider is in online state'
+            print 'Provider is in In Sync state'
         print 'Provider was created successfully.'
 
         # Import resource
@@ -154,6 +155,7 @@ class NodeconductorTest(unittest.TestCase):
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
         print 'Provider exists: ', self.provider_exists
+        # Blocker SAAS-1152
         if self.provider_exists:
             try:
                 # Delete provider
