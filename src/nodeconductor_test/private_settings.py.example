@@ -1,12 +1,12 @@
 class AWSPrivateSettings(object):
-    access_key_id_name = 'my_aws_access_key_id'
-    secret_access_key_name = 'my_aws_access_key'
+    aws_access_key_id = 'my_aws_access_key_id'
+    aws_secret_access_key = 'my_aws_access_key'
 
 
 class DigitalOceanPrivateSettings(object):
-    token_name = 'my_digitalocean_access_token'
+    digitalocean_access_token = 'my_digitalocean_access_token'
 
 
 class OrganizationBalancePrivateSettings(object):
-    email = 'my_paypal_email'
-    password_account = 'my_paypal_password'
+    payment_account_email = 'my_payment_account_email'
+    payment_account_password = 'my_payment_account_password'

@@ -67,7 +67,7 @@ class NodeconductorTest(unittest.TestCase):
         xpath = '//div[contains(text(), "%s")]' % Settings.balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.balance
         print 'Top-up balance'
-        top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.email, Settings.password_account)
+        top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.payment_account_email, Settings.payment_account_password)
         time.sleep(BaseSettings.click_time_wait)
         print 'Check topped-up balance'
         xpath = '//div[contains(text(), "%s")]' % Settings.check_balance
