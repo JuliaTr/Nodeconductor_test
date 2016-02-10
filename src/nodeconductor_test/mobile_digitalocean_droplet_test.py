@@ -77,7 +77,7 @@ class NodeconductorTest(unittest.TestCase):
         # Create provider
         print 'Provider is going to be created.'
         create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
-                                     Settings.token_name)
+                                     Settings.digitalocean_access_token)
         print 'Search created provider'
         search_field = self.driver.find_element_by_css_selector('[ng-model="generalSearch"]')
         search_field.clear()

@@ -80,7 +80,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider is going to be created.'
         time.sleep(BaseSettings.click_time_wait)
         create_provider_digitalocean(self.driver, Settings.provider_name, Settings.provider_type_name,
-                                     Settings.token_name)
+                                     Settings.digitalocean_access_token)
         _search(self.driver, Settings.provider_name)
         print 'Find provider in list'
         xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
