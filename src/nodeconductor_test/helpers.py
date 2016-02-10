@@ -204,7 +204,8 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     time.sleep(BaseSettings.click_time_wait)
     time.sleep(10)  # PayPal page loading
     print 'Switch to payment process'
-    way_to_pay = driver.find_element_by_xpath('//input[@value="Pay with my PayPal account"]')
+    print 'Page URL: %s ' % driver.current_url
+    way_to_pay = driver.find_element_by_id('loadLogin')
     way_to_pay.click()
     time.sleep(BaseSettings.click_time_wait)
     email_field = driver.find_element_by_id('login_email')

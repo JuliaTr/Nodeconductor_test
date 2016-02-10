@@ -48,6 +48,7 @@ class Settings(BaseSettings):
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
+        sys.exc_clear()
         self.driver = get_driver(Settings.site_url)
         self.project_exists = False
         self.ssh_key_exists = False
@@ -131,6 +132,7 @@ class NodeconductorTest(unittest.TestCase):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
+        print 'Organization exists: ', self.organization_exists
         if self.project_exists:
             try:
                 # Delete project

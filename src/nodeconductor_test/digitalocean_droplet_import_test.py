@@ -76,6 +76,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
+        # Blocker SAAS-1152
         # Create provider
         print 'Provider is going to be created.'
         time.sleep(BaseSettings.click_time_wait)
@@ -155,7 +156,6 @@ class NodeconductorTest(unittest.TestCase):
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
         print 'Provider exists: ', self.provider_exists
-        # Blocker SAAS-1152
         if self.provider_exists:
             try:
                 # Delete provider

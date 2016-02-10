@@ -119,6 +119,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
+        print 'Organization exists: ', self.organization_exists
         if self.application_project_exists:
             try:
                 # Delete application project
