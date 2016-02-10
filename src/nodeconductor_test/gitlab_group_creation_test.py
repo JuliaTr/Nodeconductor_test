@@ -39,13 +39,14 @@ class Settings(BaseSettings):
     application_group_name = 'Test group'
     visibility_level_name = 'The project can be cloned by any logged in user.'
     application_project_name = 'Test project'
-    time_wait_for_application_state = 10
-    time_wait_to_delete_application = 60
+    time_wait_for_application_state = 240
+    time_wait_to_delete_application = 180
 
 
 class ApplicationCreationTest(unittest.TestCase):
 
     def setUp(self):
+        sys.exc_clear()
         self.driver = get_driver(Settings.site_url)
         self.project_exists = False
         self.application_group_exists = False
@@ -75,6 +76,7 @@ class ApplicationCreationTest(unittest.TestCase):
         print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
+        # Blocker SAAS-1145
         # Create application group
         print 'Application group is going to be created.'
         create_application_group(self.driver, Settings.project_name, Settings.category_name, Settings.resource_type_name,

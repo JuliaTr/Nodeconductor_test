@@ -46,6 +46,7 @@ class Settings(BaseSettings, private_parent):
 class NodeconductorTest(unittest.TestCase):
 
     def setUp(self):
+        sys.exc_clear()
         self.driver = get_driver(Settings.site_url)
         self.project_exists = False
         self.provider_exists = False

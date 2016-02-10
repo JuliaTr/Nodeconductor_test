@@ -457,6 +457,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     print 'Go to organization page'
     _go_to_organization_details(driver)
     print 'Go to providers tab'
+    time.sleep(BaseSettings.click_time_wait)  # sometimes doesn't want to go to providers tab
     force_click(driver, css_selector='[visible="providers"]')
     print 'providers tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
@@ -620,7 +621,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     force_click(driver, css_selector='[visible="applications"]')
     print 'Applications tab was successfully choosen'
     time.sleep(BaseSettings.click_time_wait)
-    time.sleep(3)  # create button isn't selected without additional time wait
+    time.sleep(5)  # create button isn't selected without additional time wait
     print 'Create an application'
     application_creation = driver.find_element_by_link_text('Create')
     application_creation.click()
