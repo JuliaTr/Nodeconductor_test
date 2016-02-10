@@ -81,7 +81,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Provider is going to be created.'
         time.sleep(BaseSettings.click_time_wait)
         create_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
-                            Settings.access_key_id_name, Settings.secret_access_key_name)
+                            Settings.aws_access_key_id, Settings.aws_secret_access_key)
         print 'Search created provider'
         _search(self.driver, Settings.provider_name)
         print 'Find provider in list'

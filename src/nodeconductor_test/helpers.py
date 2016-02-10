@@ -452,7 +452,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     print '----- Resource deletion process ended -----'
 
 
-def create_provider_digitalocean(driver, provider_name, provider_type_name, token_name):
+def create_provider_digitalocean(driver, provider_name, provider_type_name, access_token):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
@@ -478,8 +478,8 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
     print 'Put a name of the token'
-    token_name_field = driver.find_element_by_id('DigitalOcean_token')
-    token_name_field.send_keys(token_name)
+    access_token_field = driver.find_element_by_id('DigitalOcean_token')
+    access_token_field.send_keys(access_token)
     print 'Click on add provider button'
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
@@ -487,7 +487,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, toke
 
 
 # SAAS-1120
-def create_provider_aws(driver, provider_name, provider_type_name, access_key_id_name, secret_access_key_name):
+def create_provider_aws(driver, provider_name, provider_type_name, access_key_id, secret_access_key):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
@@ -513,10 +513,10 @@ def create_provider_aws(driver, provider_name, provider_type_name, access_key_id
     provider_name_field.clear()
     provider_name_field.send_keys(provider_name)
     print 'Put a name of the access key id'
-    access_key_id_name_field = driver.find_element_by_id('Amazon_username')
-    access_key_id_name_field.send_keys(access_key_id_name)
-    secret_access_key_name_field = driver.find_element_by_id('Amazon_token')
-    secret_access_key_name_field.send_keys(secret_access_key_name)
+    access_key_id_field = driver.find_element_by_id('Amazon_username')
+    access_key_id_field.send_keys(access_key_id)
+    secret_access_key_field = driver.find_element_by_id('Amazon_token')
+    secret_access_key_field.send_keys(secret_access_key)
     print 'Click on add provider button'
     add_provider_button = driver.find_element_by_link_text('Add provider')
     add_provider_button.click()
