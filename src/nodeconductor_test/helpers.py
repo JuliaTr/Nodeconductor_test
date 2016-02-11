@@ -127,11 +127,7 @@ def force_click(driver, css_selector=None, xpath=None, link_text=None, tries_lef
 
 def get_driver(site_url):
     driver = webdriver.Firefox()
-    # Tests should run on 1024x768 resolution until agreed otherwise.
-    # If changing these numbers make sure to change screen size in Jenkins job configuration.
-    # Use 420x580 resolution to test mobile version (work in progress).
-    # TODO: read resolution value from method parameters or configuration file.
-    driver.set_window_size(1366, 768)
+    driver.set_window_size(*BaseSettings.window_resolution)
     driver.get(site_url)
     return driver
 
