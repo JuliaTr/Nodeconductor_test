@@ -9,6 +9,10 @@ import time
 import unittest
 import sys
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
                      delete_organization, element_exists, make_screenshot, _back_to_list, _search,
                      get_private_parent, choose_organization, go_to_main_page)
@@ -26,6 +30,11 @@ class Settings(BaseSettings, private_parent):
     balance = '$0.00'
     top_up_balance = '1'
     check_balance = '$1.00'
+    time_wait_to_topup_balance = 10
+    time_wait_to_go_back_to_list_of_organizations = 20
+    time_wait_alert_is_present = 10
+    time_wait_alert_invisibility = 10
+    time_wait_to_swich_to_paypal = 20
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -67,8 +76,12 @@ class NodeconductorTest(unittest.TestCase):
         xpath = '//div[contains(text(), "%s")]' % Settings.balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.balance
         print 'Top-up balance'
-        top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.payment_account_email, Settings.payment_account_password)
-        time.sleep(BaseSettings.click_time_wait)
+        top_up_organization_balance(self.driver, Settings.top_up_balance, Settings.payment_account_email,
+                                    Settings.payment_account_password, Settings.time_wait_alert_is_present,
+                                    Settings.time_wait_alert_invisibility, Settings.time_wait_to_swich_to_paypal)
+        print 'Wait till balance will be topped-up'
+        WebDriverWait(self.driver, Settings.time_wait_to_topup_balance).until(
+            EC.invisibility_of_element_located((By.XPATH, '//div[contains(text(), "Payment is being proceeded, please wait")]')))
         print 'Check topped-up balance'
         xpath = '//div[contains(text(), "%s")]' % Settings.check_balance
         assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot find balance "%s"' % Settings.check_balance
@@ -86,8 +99,9 @@ class NodeconductorTest(unittest.TestCase):
                 delete_organization(self.driver, Settings.organization)
                 self.organization_exists = False
                 print 'Organization exists: ', self.organization_exists
-                time.sleep(BaseSettings.click_time_wait)
-                time.sleep(3)  # sometimes doen't want to work without additional time wait
+                print 'Wait till go back to list option will be possible'
+                WebDriverWait(self.driver, Settings.time_wait_to_go_back_to_list_of_organizations).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'back-to-list')))
                 _back_to_list(self.driver)
                 print 'Existence check of deleted organization'
                 _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')

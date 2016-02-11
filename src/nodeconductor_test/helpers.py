@@ -185,11 +185,15 @@ def delete_organization(driver, organization):
     print '----- Organization deletion process ended -----'
 
 
-def top_up_organization_balance(driver, top_up_balance, email, password_account):
+def top_up_organization_balance(driver, top_up_balance, email, password_account, time_wait_alert_invisibility,
+                                time_wait_to_swich_to_paypal, time_wait_alert_is_present):
     print '----- Top up organization balance process started -----'
     go_to_main_page(driver)
     print 'Top-up balance'
-    time.sleep(7)   # because of alert over the button
+    WebDriverWait(driver, time_wait_alert_is_present).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '[ng-show="hasFlash"]')))
+    WebDriverWait(driver, time_wait_alert_invisibility).until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, '[ng-show="hasFlash"]')))
     balance_button = driver.find_element_by_css_selector('i.fa-credit-card')
     balance_button.click()
     add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
@@ -197,9 +201,9 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account)
     add_amount_field.send_keys(top_up_balance)
     add_credit_button = driver.find_element_by_css_selector('[submit-button="addCredit(amount)"]')
     add_credit_button.click()
-    time.sleep(BaseSettings.click_time_wait)
-    time.sleep(10)  # PayPal page loading
     print 'Switch to payment process'
+    WebDriverWait(driver, time_wait_to_swich_to_paypal).until(
+        EC.presence_of_element_located((By.ID, 'loadLogin')))
     print 'Page URL: %s ' % driver.current_url
     way_to_pay = driver.find_element_by_id('loadLogin')
     way_to_pay.click()
