@@ -24,8 +24,8 @@ class Settings(BaseSettings, private_parent):
     user_full_name = 'Alice Lebowski'
     organization = 'Test org balance'
     balance = '$0.00'
-    top_up_balance = '100'
-    check_balance = '$100.00'
+    top_up_balance = '1'
+    check_balance = '$1.00'
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -78,7 +78,7 @@ class NodeconductorTest(unittest.TestCase):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
-        print 'Organization exists: ', self.organization_exists
+            print 'Organization exists: ', self.organization_exists
         if self.organization_exists:
             try:
                 # Delete organization
@@ -87,10 +87,11 @@ class NodeconductorTest(unittest.TestCase):
                 self.organization_exists = False
                 print 'Organization exists: ', self.organization_exists
                 time.sleep(BaseSettings.click_time_wait)
+                time.sleep(3)  # sometimes doen't want to work without additional time wait
                 _back_to_list(self.driver)
                 print 'Existence check of deleted organization'
                 _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')
-                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.organization), (
+                assert not element_exists(self.driver, link_text=Settings.organization), (
                     'Error: Organization with name "%s" was not deleted, it still exists' % Settings.organization)
                 print 'Organization was deleted successfully.'
             except Exception as e:
