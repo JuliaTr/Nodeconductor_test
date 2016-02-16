@@ -62,12 +62,30 @@ def _back_to_list(driver):
     time.sleep(BaseSettings.click_time_wait)
 
 
+def _create_provider(driver):
+    print 'Push button to create a provider'
+    provider_creation = driver.find_element_by_link_text('Create provider')
+    provider_creation.click()
+    print 'To be on provider creation page'
+    time.sleep(BaseSettings.click_time_wait)
+
+
 def _remove_action(driver):
     print 'Select remove action'
     actions = driver.find_element_by_link_text('actions')
     actions.click()
     remove_field = driver.find_element_by_link_text('Remove')
     remove_field.click()
+
+
+def _go_to_tab(driver, css_selector=None, xpath=None, link_text=None, tries_left=3):
+    print 'Go to "%s" tab' % css_selector
+    WebDriverWait(driver, BaseSettings.tab_visible_time_wait).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
+    force_click(driver, css_selector=css_selector)
+    print '"%s" tab was successfully choosen' % css_selector
+    time.sleep(BaseSettings.click_time_wait)
+    time.sleep(BaseSettings.click_time_wait)
 
 
 def go_to_main_page(driver):
@@ -93,6 +111,7 @@ def is_in_list(list_element, text):
     return False
 
 
+# This function is used when element is not always visible.
 def element_exists(driver, css_selector=None, link_text=None, xpath=None):
     try:
         if css_selector is not None:
@@ -262,10 +281,7 @@ def create_ssh_key(driver, user_full_name, key_name):
     user_field.click()
     profile = driver.find_element_by_link_text('Profile')
     profile.click()
-    print 'Go to keys tab'
-    force_click(driver, css_selector='[visible="keys"]')
-    print 'keys tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="keys"]')
     print 'Push button to add SSH key'
     keys_field = driver.find_element_by_link_text('Add SSH Key')
     keys_field.click()
@@ -294,10 +310,7 @@ def delete_ssh_key(driver, key_name, user_full_name):
     user_field.click()
     profile = driver.find_element_by_link_text('Profile')
     profile.click()
-    print 'Go to keys tab'
-    force_click(driver, css_selector='[visible="keys"]')
-    print 'keys tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="keys"]')
     _search(driver, key_name)
     print 'Click on remove button'
     ssh_key_remove = driver.find_element_by_link_text('Remove')
@@ -312,10 +325,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
     print '----- Resource creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to vms tab'
-    force_click(driver, css_selector='[visible="vms"]')
-    print 'vms tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="vms"]')
     print 'Create a resource'
     resource_vms_creation = driver.find_element_by_link_text('Create')
     resource_vms_creation.click()
@@ -418,8 +428,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     go_to_main_page(driver)
     print 'Go to project page'
     _go_to_project_page(driver, project_name)
-    print 'Go to vms tab'
-    force_click(driver, css_selector='[visible="vms"]')
+    _go_to_tab(driver, css_selector='[visible="vms"]')
     print 'Search resource in the list'
     _search(driver, resource_name)
     print 'Check online state existence of the resource'
@@ -440,8 +449,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
         raise e
     else:
         print 'Resource is stopped'
-    print 'Go to vms tab'
-    force_click(driver, css_selector='[visible="vms"]')
+    _go_to_tab(driver, css_selector='[visible="vms"]')
     print 'Search resource in the list'
     _search(driver, resource_name)
     xpath = '//a[@class="status-circle offline"]'
@@ -457,16 +465,8 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, acce
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
-    print 'Go to providers tab'
-    time.sleep(BaseSettings.click_time_wait)  # sometimes doesn't want to go to providers tab
-    force_click(driver, css_selector='[visible="providers"]')
-    print 'providers tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
-    print 'Push button to create a provider'
-    provider_creation = driver.find_element_by_link_text('Create provider')
-    provider_creation.click()
-    print 'To be on provider creation page'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="providers"]')
+    _create_provider(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
@@ -492,16 +492,8 @@ def create_provider_aws(driver, provider_name, provider_type_name, access_key_id
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
-    print 'Go to providers tab'
-    force_click(driver, css_selector='[visible="providers"]')
-    print 'providers tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
-    time.sleep(3)  # sometimes click isn't executed without additional time click. There is no problem using the button manually
-    print 'Push button to create a provider'
-    provider_creation = driver.find_element_by_link_text('Create provider')
-    provider_creation.click()
-    print 'To be on provider creation page'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="providers"]')
+    _create_provider(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
@@ -550,13 +542,11 @@ def create_provider_azure(driver, provider_name, provider_type_name, subscriptio
     add_provider_button.click()
 
 
-def import_resource(driver, project_name, provider_name, category_name, resource_name):
+def import_resource(driver, project_name, provider_name, category_name, resource_name, time_wait_available_resource_for_import):
     print '----- Resource import process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to resource tab'
-    force_click(driver, css_selector='[visible="vms"]')
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="vms"]')
     print 'Import a resource'
     resource_import = driver.find_element_by_link_text('Import')
     resource_import.click()
@@ -573,10 +563,15 @@ def import_resource(driver, project_name, provider_name, category_name, resource
             provider.click()
             break
     print 'Select resource name'
-    time.sleep(BaseSettings.click_time_wait)
-    time.sleep(7)  # cannot find resource to import
-    resource = driver.find_element_by_link_text(resource_name)
-    resource.click()
+    WebDriverWait(driver, time_wait_available_resource_for_import).until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, '[ng-class="$_blockUiMessageClass"]')))
+    if not element_exists(driver, css_selector='[ng-show="ImportResource.noResources && ImportResource.selectedService.name"]'):
+        resource = driver.find_element_by_link_text(resource_name)
+        resource.click()
+        return True
+    else:
+        print 'There are no resources available for import in this provider.'
+        return False
     print 'Click on import button'
     import_button = driver.find_element_by_link_text('Import')
     import_button.click()
@@ -587,9 +582,7 @@ def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to resource tab'
-    force_click(driver, css_selector='[visible="vms"]')
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="vms"]')
     _search(driver, resource_name)
     print 'Open project actions'
     force_click(driver, css_selector='[ng-click="openActionsListTrigger()"]')
@@ -603,10 +596,7 @@ def delete_provider(driver, provider_name):
     print '----- Provider deletion process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
-    print 'Go to providers tab'
-    force_click(driver, css_selector='[visible="providers"]')
-    print 'Providers tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="providers"]')
     _search(driver, provider_name)
     print 'Click on delete button'
     force_click(driver, css_selector='[ng-class="{\'disabled\': button.isDisabled(buttonModel)}"]')
@@ -618,10 +608,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     print '----- Application group creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to applications tab'
-    force_click(driver, css_selector='[visible="applications"]')
-    print 'Applications tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="applications"]')
     time.sleep(5)  # create button isn't selected without additional time wait
     print 'Create an application'
     application_creation = driver.find_element_by_link_text('Create')
@@ -657,10 +644,7 @@ def create_application_project(driver, project_name, category_name, resource_typ
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to applications tab'
-    force_click(driver, css_selector='[visible="applications"]')
-    print 'Applications tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="applications"]')
     print 'Create an application'
     application_creation = driver.find_element_by_link_text('Create')
     application_creation.click()
@@ -703,10 +687,7 @@ def delete_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to applications tab'
-    force_click(driver, css_selector='[visible="applications"]')
-    print 'Applications tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="applications"]')
     _search(driver, application_group_name)
     _remove_action(driver)
     _confirm_alert(driver, application_group_name)
@@ -717,10 +698,7 @@ def delete_application_project(driver, project_name, application_project_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    print 'Go to applications tab'
-    force_click(driver, css_selector='[visible="applications"]')
-    print 'Applications tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="applications"]')
     _search(driver, application_project_name)
     _remove_action(driver)
     _confirm_alert(driver, application_project_name)
