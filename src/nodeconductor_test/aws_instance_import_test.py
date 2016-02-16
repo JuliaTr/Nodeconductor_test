@@ -41,6 +41,7 @@ class Settings(BaseSettings, private_parent):
     resource_name = 'docker-build-host'
     resource_cost = '$53.59'
     time_wait_for_provider_state = 420
+    time_wait_available_resource_for_import = 20
 
 
 class NodeconductorTest(unittest.TestCase):
@@ -102,8 +103,10 @@ class NodeconductorTest(unittest.TestCase):
 
         # Import resource
         print 'Resource is going to be imported.'
-        import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
-                        Settings.resource_name)
+        imported = import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
+                                   Settings.resource_name, Settings.time_wait_available_resource_for_import)
+        if not imported:
+            return
         _search(self.driver, Settings.resource_name)
         print 'Go to resource page'
         resource = self.driver.find_element_by_link_text(Settings.resource_name)
