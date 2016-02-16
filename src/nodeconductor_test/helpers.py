@@ -62,7 +62,7 @@ def _back_to_list(driver):
     time.sleep(BaseSettings.click_time_wait)
 
 
-def _create_provider(driver):
+def _go_to_provider_create_page(driver):
     print 'Push button to create a provider'
     provider_creation = driver.find_element_by_link_text('Create provider')
     provider_creation.click()
@@ -78,7 +78,7 @@ def _remove_action(driver):
     remove_field.click()
 
 
-def _go_to_tab(driver, css_selector=None, xpath=None, link_text=None, tries_left=3):
+def _go_to_tab(driver, css_selector=None):
     print 'Go to "%s" tab' % css_selector
     WebDriverWait(driver, BaseSettings.tab_visible_time_wait).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
@@ -466,7 +466,7 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, acce
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _go_to_tab(driver, css_selector='[visible="providers"]')
-    _create_provider(driver)
+    _go_to_provider_create_page(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
@@ -493,7 +493,7 @@ def create_provider_aws(driver, provider_name, provider_type_name, access_key_id
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _go_to_tab(driver, css_selector='[visible="providers"]')
-    _create_provider(driver)
+    _go_to_provider_create_page(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
