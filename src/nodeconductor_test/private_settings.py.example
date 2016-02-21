@@ -3,6 +3,10 @@ class AWSPrivateSettings(object):
     aws_secret_access_key = 'my_aws_access_key'
 
 
+class AzurePrivateSettings(object):
+    azure_os_password = 'my_azure_os_password'
+
+
 class DigitalOceanPrivateSettings(object):
     digitalocean_access_token = 'my_digitalocean_access_token'
 

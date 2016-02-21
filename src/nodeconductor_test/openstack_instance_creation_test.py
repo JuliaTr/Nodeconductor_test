@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     time_wait_after_resource_removal = 60
 
 
-class NodeconductorTest(unittest.TestCase):
+class OpenStackCreationTest(unittest.TestCase):
 
     def setUp(self):
         sys.exc_clear()
@@ -55,7 +55,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_key_resource(self):
+    def test_create_delete_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
