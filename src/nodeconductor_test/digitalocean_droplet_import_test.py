@@ -41,9 +41,10 @@ class Settings(BaseSettings, private_parent):
     resource_name = 'SIB-test'
     resource_cost = '$5.00'
     time_wait_for_provider_state = 30
+    time_wait_tab_visibility = 15
 
 
-class NodeconductorTest(unittest.TestCase):
+class DigitalOceanResourceImportTest(unittest.TestCase):
 
     def setUp(self):
         sys.exc_clear()
@@ -53,7 +54,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_provider_import_unlink_resource(self):
+    def test_import_unlink_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -76,7 +77,7 @@ class NodeconductorTest(unittest.TestCase):
         print 'Project exists: ', self.project_exists
         print 'Project was created successfully.'
 
-        # Blocker SAAS-1152
+        # SAAS-1152
         # Create provider
         print 'Provider is going to be created.'
         time.sleep(BaseSettings.click_time_wait)
@@ -99,10 +100,12 @@ class NodeconductorTest(unittest.TestCase):
             print 'Provider is in In Sync state'
         print 'Provider was created successfully.'
 
+        # Blocker SAAS-1176
         # Import resource
         print 'Resource is going to be imported.'
-        import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
-                        Settings.resource_name)
+        imported = import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name, Settings.resource_name)
+        if not imported:
+            return
         _search(self.driver, Settings.resource_name)
         print 'Go to resource page'
         resource = self.driver.find_element_by_link_text(Settings.resource_name)

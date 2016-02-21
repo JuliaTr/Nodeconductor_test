@@ -88,6 +88,19 @@ def _go_to_tab(driver, css_selector=None):
     time.sleep(BaseSettings.click_time_wait)
 
 
+def _create_button(driver, key):
+    print 'Create %s' % key
+    resource_vms_creation = driver.find_element_by_link_text('Create')
+    resource_vms_creation.click()
+    time.sleep(BaseSettings.click_time_wait)
+
+
+def _purchase(driver):
+    print 'Click on purchase button'
+    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
+    purchase.click()
+
+
 def go_to_main_page(driver):
     split = urlparse.urlsplit(driver.current_url)
     driver.get('%s://%s/' % (split.scheme, split.netloc))
@@ -326,10 +339,7 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="vms"]')
-    print 'Create a resource'
-    resource_vms_creation = driver.find_element_by_link_text('Create')
-    resource_vms_creation.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _create_button(driver, resource_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -363,64 +373,59 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
         if public_key.text == public_key_name:
             public_key.click()
             break
-    print 'Click on purchase button'
-    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
-    purchase.click()
+    _purchase(driver)
     print '----- Resource creation process ended -----'
 
 
-# To use this function it is necessary to be already on dashboard
 def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
-                          username, os_password, size_name):
+                          username, azure_os_password, size_name):
+    print '----- Resource creation process started -----'
+    go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
-    force_click(driver, css_selector='[visible="vms"]')
-    print 'vms tab was successfully choosen'
-    time.sleep(BaseSettings.click_time_wait)
-    resource_vms_creation = driver.find_element_by_link_text('Create')
-    resource_vms_creation.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _go_to_tab(driver, css_selector='[visible="vms"]')
+    _create_button(driver, resource_name)
+    print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
-        if category.text == category_name:
+        if category_name in category.text:
             category.click()
             break
-
+    print 'Provider selection'
     providers = driver.find_elements_by_class_name('appstore-template')
     for provider in providers:
         if provider.text == provider_name:
             provider.click()
             break
-
+    print 'Put OS name'
     resource_os_username_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
     resource_os_username_field.send_keys(username)
-
+    print 'Put OS password'
     os_password_field = driver.find_element_by_class_name('appstore-password')
-    os_password_field.send_keys(os_password)
-
+    os_password_field.send_keys(azure_os_password)
+    print 'Repeat OS password'
     repeat_os_password_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[\'repeat_password\']"]')
-    repeat_os_password_field.send_keys(os_password)
-
-    repeat_os_password_field = driver.find_element_by_id('name')
-    repeat_os_password_field.send_keys(resource_name)
-
-    search_field = driver.find_element_by_css_selector('[ng-model="field.searchQuery"]')
+    repeat_os_password_field.send_keys(azure_os_password)
+    print 'Put resource name'
+    resource_name_field = driver.find_element_by_id('name')
+    resource_name_field.send_keys(resource_name)
+    print 'Search image'
+    search_image_field = driver.find_element_by_css_selector('[ng-model="field.searchQuery"]')
     time.sleep(BaseSettings.search_time_wait)
-    search_field.send_keys(image_name)
-
+    search_image_field.send_keys(image_name)
+    print'Image selection'
     images = driver.find_elements_by_class_name('appstore-template-image')
     for image in images:
         if image.text == image_name:
             image.click()
             break
-
+    print 'Size selection'
     sizes = driver.find_elements_by_class_name('title')
     for size in sizes:
         if size.text == size_name:
             size.click()
             break
-
-    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
-    purchase.click()
+    _purchase(driver)
+    print '----- Resource creation process ended -----'
 
 
 def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping):
@@ -610,11 +615,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
     time.sleep(5)  # create button isn't selected without additional time wait
-    print 'Create an application'
-    application_creation = driver.find_element_by_link_text('Create')
-    application_creation.click()
-    print 'To be on provider creation page'
-    time.sleep(BaseSettings.click_time_wait)
+    _create_button(driver, application_group_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -633,9 +634,7 @@ def create_application_group(driver, project_name, category_name, resource_type_
     print 'Put application group name'
     application_name_field = driver.find_element_by_id('name')
     application_name_field.send_keys(application_group_name)
-    print 'Purchase an application group'
-    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
-    purchase.click()
+    _purchase(driver)
     print '----- Application group creation process ended -----'
 
 
@@ -645,10 +644,7 @@ def create_application_project(driver, project_name, category_name, resource_typ
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
-    print 'Create an application'
-    application_creation = driver.find_element_by_link_text('Create')
-    application_creation.click()
-    time.sleep(BaseSettings.click_time_wait)
+    _create_button(driver, application_project_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -677,9 +673,7 @@ def create_application_project(driver, project_name, category_name, resource_typ
     print 'Put application project name'
     application_name_field = driver.find_element_by_css_selector('[ng-model="AppStore.instance[field.name]"]')
     application_name_field.send_keys(application_project_name)
-    print 'Purchase an application project'
-    purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
-    purchase.click()
+    _purchase(driver)
     print '----- Application project creation process ended -----'
 
 

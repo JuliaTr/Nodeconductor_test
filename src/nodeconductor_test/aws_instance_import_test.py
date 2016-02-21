@@ -21,8 +21,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider_aws, import_resource, unlink_resource, delete_provider, _search,
-                     element_exists, go_to_main_page, make_screenshot, get_private_parent)
+                     create_provider_aws, import_resource, unlink_resource, delete_provider, _search, element_exists,
+                     go_to_main_page, make_screenshot, get_private_parent)
 from base import BaseSettings
 
 private_parent = get_private_parent('AWSPrivateSettings')
@@ -44,7 +44,7 @@ class Settings(BaseSettings, private_parent):
     time_wait_available_resource_for_import = 20
 
 
-class NodeconductorTest(unittest.TestCase):
+class AWSResourceImportTest(unittest.TestCase):
 
     def setUp(self):
         sys.exc_clear()
@@ -54,7 +54,7 @@ class NodeconductorTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
 
-    def test_create_delete_project_provider_import_unlink_resource(self):
+    def test_import_unlink_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
