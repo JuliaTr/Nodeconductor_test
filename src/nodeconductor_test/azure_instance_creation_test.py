@@ -23,8 +23,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
                      create_resource_azure, element_exists, delete_resource, make_screenshot, get_private_parent,
                      _search)
-
 from base import BaseSettings
+
 private_parent = get_private_parent('AzurePrivateSettings')
 
 
