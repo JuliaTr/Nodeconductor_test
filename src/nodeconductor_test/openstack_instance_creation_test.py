@@ -111,13 +111,13 @@ class OpenStackCreationTest(unittest.TestCase):
             print 'Resource is in online state'
         print 'Resource was created successfully.'
 
+        # SAAS-1133
         # Delete resource
         print 'Resource is going to be deleted.'
         delete_resource(self.driver, Settings.resource_name, Settings.project_name,
                         Settings.time_wait_after_resource_stopping)
         self.resource_exists = False
-        print 'Resource exists: ', self.resource_exists
-        # Bug SAAS-1133
+        # print 'Resource exists: ', self.resource_exists
         # _search(self.driver, Settings.resource_name)
         # print 'Wait till resource will be deleted'
         # try:
@@ -132,7 +132,6 @@ class OpenStackCreationTest(unittest.TestCase):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver)
-        print 'Organization exists: ', self.organization_exists
         if self.project_exists:
             try:
                 # Delete project
@@ -144,6 +143,7 @@ class OpenStackCreationTest(unittest.TestCase):
                 _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
+                    print 'Project exists: ', self.project_exists
                 print 'Project was deleted successfully.'
             except Exception as e:
                 print 'Project cannot be deleted. Error: "%s"' % e
