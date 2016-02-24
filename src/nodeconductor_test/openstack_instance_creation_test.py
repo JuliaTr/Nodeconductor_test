@@ -32,13 +32,13 @@ class Settings(BaseSettings):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     organization = 'Test only org'
-    project_name = 'OpenStack test project'
+    project_name = 'OpenStack test project1'
     key_name = 'Openstack test key'
     category_name = 'VMs'
     provider_name_in_resource = 'Parnu lab'
     image_name = 'Ubuntu 14.04 x86_64'
     flavor_name = 'm1.small'
-    resource_name = 'OpenStack test instance'
+    resource_name = 'OpenStack test instance1'
     public_key_name = 'Openstack test key'
     time_wait_for_resource_creation = 240
     time_wait_after_resource_stopping = 180
@@ -117,7 +117,7 @@ class OpenStackCreationTest(unittest.TestCase):
         delete_resource(self.driver, Settings.resource_name, Settings.project_name,
                         Settings.time_wait_after_resource_stopping)
         self.resource_exists = False
-        # print 'Resource exists: ', self.resource_exists
+        print 'Resource exists: ', self.resource_exists
         # _search(self.driver, Settings.resource_name)
         # print 'Wait till resource will be deleted'
         # try:
@@ -131,7 +131,7 @@ class OpenStackCreationTest(unittest.TestCase):
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
-            make_screenshot(self.driver)
+            make_screenshot(self.driver, name=self.__class__.__name__)
         if self.project_exists:
             try:
                 # Delete project

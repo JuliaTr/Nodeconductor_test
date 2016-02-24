@@ -37,7 +37,7 @@ class Settings(BaseSettings, private_parent):
     time_wait_to_swich_to_paypal = 20
 
 
-class NodeconductorTest(unittest.TestCase):
+class OrganizationBalanceTest(unittest.TestCase):
 
     def setUp(self):
         sys.exc_clear()
@@ -90,7 +90,7 @@ class NodeconductorTest(unittest.TestCase):
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
-            make_screenshot(self.driver)
+            make_screenshot(self.driver, name=self.__class__.__name__)
             print 'Organization exists: ', self.organization_exists
         if self.organization_exists:
             try:

@@ -118,7 +118,7 @@ class ApplicationCreationTest(unittest.TestCase):
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
-            make_screenshot(self.driver)
+            make_screenshot(self.driver, name=self.__class__.__name__)
         print 'Organization exists: ', self.organization_exists
         if self.application_project_exists:
             try:

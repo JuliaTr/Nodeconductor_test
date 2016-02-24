@@ -107,9 +107,8 @@ def go_to_main_page(driver):
     time.sleep(BaseSettings.click_time_wait)  # organization page isn't downloaded at once.
 
 
-def make_screenshot(driver, name=None):
-    if name is None:
-        name = str(datetime.datetime.now()) + '.png'
+def make_screenshot(driver, name=''):
+    name = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ' ' + name + '.png'
     name = name.replace(' ', '_')
     print "Make screenshot with name " + name
     if not os.path.exists(BaseSettings.screenshots_folder):
@@ -234,9 +233,10 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account,
     add_credit_button = driver.find_element_by_css_selector('[submit-button="addCredit(amount)"]')
     add_credit_button.click()
     print 'Switch to payment process'
+    # TODO: Add explicit time wait
+    print 'Page URL: %s ' % driver.current_url
     WebDriverWait(driver, time_wait_to_swich_to_paypal).until(
         EC.presence_of_element_located((By.ID, 'loadLogin')))
-    print 'Page URL: %s ' % driver.current_url
     way_to_pay = driver.find_element_by_id('loadLogin')
     way_to_pay.click()
     time.sleep(BaseSettings.click_time_wait)

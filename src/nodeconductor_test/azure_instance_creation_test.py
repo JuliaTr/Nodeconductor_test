@@ -110,7 +110,7 @@ class AzureResourceCreationTest(unittest.TestCase):
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
-            make_screenshot(self.driver)
+            make_screenshot(self.driver, name=self.__class__.__name__)
         if self.project_exists:
             try:
                 # Delete project
