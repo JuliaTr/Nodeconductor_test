@@ -50,7 +50,7 @@ def _go_to_project_page(driver, key):
 
 
 def _confirm_alert(driver, key):
-    print 'Accept %s delete confirmation popup' % key
+    print 'Accept %s remove confirmation popup' % key
     alert = driver.switch_to_alert()
     alert.accept()
 
@@ -62,9 +62,9 @@ def _back_to_list(driver):
     time.sleep(BaseSettings.click_time_wait)
 
 
-def _go_to_provider_create_page(driver):
-    print 'Push button to create a provider'
-    provider_creation = driver.find_element_by_link_text('Create provider')
+def _go_to_provider_add_page(driver):
+    print 'Push button to add a provider'
+    provider_creation = driver.find_element_by_link_text('Add provider')
     provider_creation.click()
     print 'To be on provider creation page'
     time.sleep(BaseSettings.click_time_wait)
@@ -88,9 +88,9 @@ def _go_to_tab(driver, css_selector=None):
     time.sleep(BaseSettings.click_time_wait)
 
 
-def _create_button(driver, key):
-    print 'Create %s' % key
-    resource_vms_creation = driver.find_element_by_link_text('Create')
+def _add_button(driver, key):
+    print 'Add %s' % key
+    resource_vms_creation = driver.find_element_by_link_text('Add')
     resource_vms_creation.click()
     time.sleep(BaseSettings.click_time_wait)
 
@@ -99,6 +99,18 @@ def _purchase(driver):
     print 'Click on purchase button'
     purchase = driver.find_element_by_css_selector('[submit-button="AppStore.save()"]')
     purchase.click()
+
+
+def _provider_availability(driver):
+    print'Select provider availability'
+    select_for_all_projects = driver.find_element_by_id('DigitalOcean_available_for_all')
+    select_for_all_projects.click()
+
+
+def _add_provider_button(driver):
+    print 'Click on add provider button'
+    add_provider_button = driver.find_element_by_link_text('Add provider')
+    add_provider_button.click()
 
 
 def go_to_main_page(driver):
@@ -186,29 +198,29 @@ def choose_organization(driver, organization):
     print '----- Organization selection process ended -----'
 
 
-def create_organization(driver, organization):
+def add_organization(driver, organization):
     print '----- Organization creation process started -----'
     _go_to_organization_details(driver)
     _back_to_list(driver)
     # time.sleep(20)  # without additional time it leads to 404 page. Manualy it doesn't lead to 404 page.
-    print 'Create organization'
+    print 'Add organization'
     add_organization_button = driver.find_element_by_xpath('//a[contains(@class, \'button\') and span[contains(text(), \'Add organization\')]]')
     add_organization_button.click()
     organization_name_field = driver. find_element_by_css_selector('[ng-model="CustomerAdd.instance.name"]')
     organization_name_field.send_keys(organization)
-    create_organization_button = driver. find_element_by_link_text('Create organization')
-    create_organization_button.click()
+    add_organization_button = driver. find_element_by_link_text('Add organization')
+    add_organization_button.click()
     print '----- Organization creation process ended -----'
 
 
-def delete_organization(driver, organization):
+def remove_organization(driver, organization):
     print '----- Organization deletion process started -----'
     go_to_main_page(driver)
     print 'Go to organization page'
     time.sleep(BaseSettings.click_time_wait)
     _go_to_organization_details(driver)
     _back_to_list(driver)
-    print 'Delete organization'
+    print 'Remove organization'
     _search(driver, organization, css_selector='[ng-model="entityList.searchInput"]')
     print 'Open organization actions'
     _remove_action(driver)
@@ -233,7 +245,7 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account,
     add_credit_button = driver.find_element_by_css_selector('[submit-button="addCredit(amount)"]')
     add_credit_button.click()
     print 'Switch to payment process'
-    # TODO: Add explicit time wait
+    # TODO: Add explicit time wait till elements will be loaded.
     print 'Page URL: %s ' % driver.current_url
     WebDriverWait(driver, time_wait_to_swich_to_paypal).until(
         EC.presence_of_element_located((By.ID, 'loadLogin')))
@@ -254,24 +266,24 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account,
     print '----- Top up organization balance process ended -----'
 
 
-def create_project(driver, project_name, project_description=''):
+def add_project(driver, project_name, project_description=''):
     print '----- Project creation process started -----'
     go_to_main_page(driver)
     add_new_project_field = driver.find_element_by_class_name('button-apply')
     add_new_project_field.click()
-    print 'Create a project'
+    print 'Add a project'
     project_name_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.name"]')
     project_name_field.send_keys(project_name)
     if project_description:
         project_description_field = driver.find_element_by_css_selector('[ng-model="ProjectAdd.project.description"]')
         project_description_field.send_keys(project_description)
-    print 'Click on create project button'
-    create_project_field = driver.find_element_by_class_name('button-apply')
-    create_project_field.click()
+    print 'Click on add project button'
+    add_project_field = driver.find_element_by_class_name('button-apply')
+    add_project_field.click()
     print '----- Project creation process ended -----'
 
 
-def delete_project(driver, project_name):
+def remove_project(driver, project_name):
     print '----- Project deletion process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
@@ -287,7 +299,7 @@ def delete_project(driver, project_name):
     print '----- Project deletion process ended -----'
 
 
-def create_ssh_key(driver, user_full_name, key_name):
+def add_ssh_key(driver, user_full_name, key_name):
     print '----- SSH key creation process started -----'
     print 'Go to profile page'
     user_field = driver.find_element_by_class_name('user-name')
@@ -316,7 +328,7 @@ def create_ssh_key(driver, user_full_name, key_name):
     print '----- SSH key creation process ended -----'
 
 
-def delete_ssh_key(driver, key_name, user_full_name):
+def H_ssh_key(driver, key_name, user_full_name):
     print '----- SSH key deletion process started -----'
     print 'Go to profile page'
     user_field = driver.find_element_by_class_name('user-name')
@@ -333,13 +345,13 @@ def delete_ssh_key(driver, key_name, user_full_name):
 
 
 # Blocker SAAS-1141
-def create_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
+def add_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
                               image_name, flavor_name, public_key_name):
     print '----- Resource creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="vms"]')
-    _create_button(driver, resource_name)
+    _add_button(driver, resource_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -377,13 +389,13 @@ def create_resource_openstack(driver, project_name, resource_name, category_name
     print '----- Resource creation process ended -----'
 
 
-def create_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
+def add_resource_azure(driver, project_name, resource_name, category_name, provider_name, image_name,
                           username, azure_os_password, size_name):
     print '----- Resource creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="vms"]')
-    _create_button(driver, resource_name)
+    _add_button(driver, resource_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -428,7 +440,7 @@ def create_resource_azure(driver, project_name, resource_name, category_name, pr
     print '----- Resource creation process ended -----'
 
 
-def delete_resource(driver, resource_name, project_name, time_wait_after_resource_stopping):
+def remove_resource(driver, resource_name, project_name, time_wait_after_resource_stopping):
     print '----- Resource deletion process started -----'
     go_to_main_page(driver)
     print 'Go to project page'
@@ -445,7 +457,7 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     actions.click()
     stop_field = driver.find_element_by_link_text('Stop')
     stop_field.click()
-    print 'Wait for stop of created resource'
+    print 'Wait for stop of added resource'
     try:
         WebDriverWait(driver, time_wait_after_resource_stopping).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.offline")))
@@ -459,19 +471,19 @@ def delete_resource(driver, resource_name, project_name, time_wait_after_resourc
     _search(driver, resource_name)
     xpath = '//a[@class="status-circle offline"]'
     assert element_exists(driver, xpath=xpath), (
-        'Error: cannot delete resource "%s" that is not offline, was not stopped,'
+        'Error: cannot remove resource "%s" that is not offline, was not stopped,'
         'or does not exist' % resource_name)
     _remove_action(driver)
     _confirm_alert(driver, resource_name)
     print '----- Resource deletion process ended -----'
 
 
-def create_provider_digitalocean(driver, provider_name, provider_type_name, access_token):
+def add_provider_digitalocean(driver, provider_name, provider_type_name, access_token):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _go_to_tab(driver, css_selector='[visible="providers"]')
-    _go_to_provider_create_page(driver)
+    _go_to_provider_add_page(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
@@ -486,19 +498,18 @@ def create_provider_digitalocean(driver, provider_name, provider_type_name, acce
     print 'Put a name of the token'
     access_token_field = driver.find_element_by_id('DigitalOcean_token')
     access_token_field.send_keys(access_token)
-    print 'Click on add provider button'
-    add_provider_button = driver.find_element_by_link_text('Add provider')
-    add_provider_button.click()
+    _provider_availability(driver)
+    _add_provider_button(driver)
     print '----- Provider creation process ended -----'
 
 
 # SAAS-1120
-def create_provider_aws(driver, provider_name, provider_type_name, access_key_id, secret_access_key):
+def add_provider_aws(driver, provider_name, provider_type_name, access_key_id, secret_access_key):
     print '----- Provider creation process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _go_to_tab(driver, css_selector='[visible="providers"]')
-    _go_to_provider_create_page(driver)
+    _go_to_provider_add_page(driver)
     print 'Provider type selection'
     provider_type_list = driver.find_elements_by_class_name('appstore-template')
     for provider_type in provider_type_list:
@@ -515,20 +526,17 @@ def create_provider_aws(driver, provider_name, provider_type_name, access_key_id
     access_key_id_field.send_keys(access_key_id)
     secret_access_key_field = driver.find_element_by_id('Amazon_token')
     secret_access_key_field.send_keys(secret_access_key)
-    print 'Click on add provider button'
-    add_provider_button = driver.find_element_by_link_text('Add provider')
-    add_provider_button.click()
+    _provider_availability(driver)
+    _add_provider_button(driver)
     print '----- Provider creation process ended -----'
 
 
 # Method isn't completed yet.
 # TODO: Add certificate.
-def create_provider_azure(driver, provider_name, provider_type_name, subscription_id_name):
+def add_provider_azure(driver, provider_name, provider_type_name, subscription_id_name):
     _go_to_organization_details(driver)
-    providers = driver.find_element_by_css_selector('[visible="providers"]')
-    providers.click()
-    time.sleep(5)
-    provider_creation = driver.find_element_by_link_text('Create provider')
+    _go_to_tab(driver, css_selector='[visible="providers"]')
+    provider_creation = driver.find_element_by_link_text('Add provider')
     provider_creation.click()
     time.sleep(5)
     provider_type = driver.find_element_by_class_name(provider_type_name)
@@ -570,16 +578,17 @@ def import_resource(driver, project_name, provider_name, category_name, resource
     print 'Select resource name'
     WebDriverWait(driver, time_wait_available_resource_for_import).until(
         EC.invisibility_of_element_located((By.CSS_SELECTOR, '[ng-class="$_blockUiMessageClass"]')))
-    if not element_exists(driver, css_selector='[ng-show="ImportResource.noResources && ImportResource.selectedService.name"]'):
-        resource = driver.find_element_by_link_text(resource_name)
-        resource.click()
-        return True
-    else:
+    element = driver.find_element_by_css_selector('[ng-show="ImportResource.noResources && ImportResource.selectedService.name"]')
+    if element.is_displayed():
         print 'There are no resources available for import in this provider.'
         return False
+    resource = driver.find_element_by_link_text(resource_name)
+    resource.click()
+    time.sleep(BaseSettings.click_time_wait)
     print 'Click on import button'
     import_button = driver.find_element_by_link_text('Import')
     import_button.click()
+    return True
     print '----- Resource import process ended -----'
 
 
@@ -597,25 +606,25 @@ def unlink_resource(driver, project_name, resource_name):
     print '----- Resource unlink process ended -----'
 
 
-def delete_provider(driver, provider_name):
+def remove_provider(driver, provider_name):
     print '----- Provider deletion process started -----'
     print 'Go to organization page'
     _go_to_organization_details(driver)
     _go_to_tab(driver, css_selector='[visible="providers"]')
     _search(driver, provider_name)
-    print 'Click on delete button'
+    print 'Click on remove button'
     force_click(driver, css_selector='[ng-class="{\'disabled\': button.isDisabled(buttonModel)}"]')
     _confirm_alert(driver, provider_name)
     print '----- Provider deletion process ended -----'
 
 
-def create_application_group(driver, project_name, category_name, resource_type_name, path_name, application_group_name):
+def add_application_group(driver, project_name, category_name, resource_type_name, path_name, application_group_name):
     print '----- Application group creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
-    time.sleep(5)  # create button isn't selected without additional time wait
-    _create_button(driver, application_group_name)
+    time.sleep(5)  # add button isn't selected without additional time wait
+    _add_button(driver, application_group_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -638,13 +647,13 @@ def create_application_group(driver, project_name, category_name, resource_type_
     print '----- Application group creation process ended -----'
 
 
-def create_application_project(driver, project_name, category_name, resource_type_name1,
+def add_application_project(driver, project_name, category_name, resource_type_name1,
                                application_project_name, visibility_level_name, application_group_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
-    _create_button(driver, application_project_name)
+    _add_button(driver, application_project_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
     for category in categories:
@@ -677,7 +686,7 @@ def create_application_project(driver, project_name, category_name, resource_typ
     print '----- Application project creation process ended -----'
 
 
-def delete_application_group(driver, project_name, application_group_name):
+def remove_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
@@ -688,7 +697,7 @@ def delete_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process ended -----'
 
 
-def delete_application_project(driver, project_name, application_project_name):
+def remove_application_project(driver, project_name, application_project_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)

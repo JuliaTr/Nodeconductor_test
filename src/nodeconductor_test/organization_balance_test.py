@@ -1,8 +1,8 @@
 """
 1. Login NC
-2. Create organization
+2. Add organization
 3. Top-up balance
-4. Delete organization
+4. Remove organization
 """
 
 import time
@@ -13,8 +13,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from helpers import (login_nodeconductor, get_driver, create_organization, top_up_organization_balance,
-                     delete_organization, element_exists, make_screenshot, _back_to_list, _search,
+from helpers import (login_nodeconductor, get_driver, add_organization, top_up_organization_balance,
+                     remove_organization, element_exists, make_screenshot, _back_to_list, _search,
                      get_private_parent, choose_organization, go_to_main_page)
 from base import BaseSettings
 
@@ -53,16 +53,16 @@ class OrganizationBalanceTest(unittest.TestCase):
         assert username_idt_field.text == Settings.user_full_name, 'Error. Another username.'
         print '%s was logged in successfully.' % Settings.username
 
-        # Create organization
-        print 'Organization is going to be created.'
+        # Add organization
+        print 'Organization is going to be added.'
         time.sleep(BaseSettings.click_time_wait)
-        create_organization(self.driver, Settings.organization)
-        print 'Existence check of created organization'
+        add_organization(self.driver, Settings.organization)
+        print 'Existence check of added organization'
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.organization
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create organization "%s"' % Settings.organization
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add organization "%s"' % Settings.organization
         self.organization_exists = True
         print 'Organization exists: ', self.organization_exists
-        print 'Organization was created successfully.'
+        print 'Organization was added successfully.'
 
         # Choose organization
         print 'Organization is going to be chosen.'
@@ -94,25 +94,25 @@ class OrganizationBalanceTest(unittest.TestCase):
             print 'Organization exists: ', self.organization_exists
         if self.organization_exists:
             try:
-                # Delete organization
-                print 'Organization is going to be deleted.'
-                delete_organization(self.driver, Settings.organization)
+                # Remove organization
+                print 'Organization is going to be removed.'
+                remove_organization(self.driver, Settings.organization)
                 self.organization_exists = False
                 print 'Organization exists: ', self.organization_exists
                 print 'Wait till go back to list option will be possible'
                 WebDriverWait(self.driver, Settings.time_wait_to_go_back_to_list_of_organizations).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'back-to-list')))
+                    EC.element_to_be_clickable((By.CLASS_NAME, 'back-to-list')))
                 _back_to_list(self.driver)
-                print 'Existence check of deleted organization'
+                print 'Existence check of removed organization'
                 _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')
                 assert not element_exists(self.driver, link_text=Settings.organization), (
-                    'Error: Organization with name "%s" was not deleted, it still exists' % Settings.organization)
-                print 'Organization was deleted successfully.'
+                    'Error: Organization with name "%s" was not removed, it still exists' % Settings.organization)
+                print 'Organization was removed successfully.'
             except Exception as e:
-                print 'Organization cannot be deleted. Error: "%s"' % e
+                print 'Organization cannot be removed. Error: "%s"' % e
 
         if self.organization_exists:
-            print 'Warning! Test cannot delete organization "%s". It has to be deleted manually.' % Settings.organization
+            print 'Warning! Test cannot remove organization "%s". It has to be removed manually.' % Settings.organization
 
         self.driver.quit()
 
