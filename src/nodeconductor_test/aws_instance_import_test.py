@@ -1,12 +1,12 @@
 """
 1. Login NC
 2. Choose organization
-3. Create project
-4. Create provider
+3. Add project
+4. Add provider
 5. Import resource
 6. Unlink resource
-7. Delete provider
-8. Delete project
+7. Remove provider
+8. Remove project
 """
 
 
@@ -20,8 +20,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_provider_aws, import_resource, unlink_resource, delete_provider, _search, element_exists,
+from helpers import (login_nodeconductor, get_driver, add_project, remove_project, choose_organization,
+                     add_provider_aws, import_resource, unlink_resource, remove_provider, _search, element_exists,
                      go_to_main_page, make_screenshot, get_private_parent)
 from base import BaseSettings
 
@@ -67,30 +67,30 @@ class AWSResourceImportTest(unittest.TestCase):
         choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
 
-        # Create project
-        print 'Project is going to be created.'
-        create_project(self.driver, Settings.project_name)
+        # Add project
+        print 'Project is going to be added.'
+        add_project(self.driver, Settings.project_name)
         time.sleep(BaseSettings.click_time_wait)
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create project "%s"' % Settings.project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % Settings.project_name
         self.project_exists = True
         print 'Project exists: ', self.project_exists
-        print 'Project was created successfully.'
+        print 'Project was added successfully.'
 
         # SAAS-1120
-        # Create provider
-        print 'Provider is going to be created.'
+        # Add provider
+        print 'Provider is going to be added.'
         time.sleep(BaseSettings.click_time_wait)
-        create_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
-                            Settings.aws_access_key_id, Settings.aws_secret_access_key)
-        print 'Search created provider'
+        add_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
+                         Settings.aws_access_key_id, Settings.aws_secret_access_key)
+        print 'Search added provider'
         _search(self.driver, Settings.provider_name)
         print 'Find provider in list'
         xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
         assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
         self.provider_exists = True
         print 'Provider exists: ', self.provider_exists
-        print 'Find online state of created provider'
+        print 'Find online state of added provider'
         try:
             WebDriverWait(self.driver, Settings.time_wait_for_provider_state).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".status-circle.online")))
@@ -99,7 +99,7 @@ class AWSResourceImportTest(unittest.TestCase):
             raise e
         else:
             print 'Provider is in online state'
-        print 'Provider was created successfully.'
+        print 'Provider was added successfully.'
 
         # Import resource
         print 'Resource is going to be imported.'
@@ -162,40 +162,40 @@ class AWSResourceImportTest(unittest.TestCase):
         print 'Provider exists: ', self.provider_exists
         if self.provider_exists:
             try:
-                # Delete provider
-                print 'Provider is going to be deleted.'
-                delete_provider(self.driver, Settings.provider_name)
+                # Remove provider
+                print 'Provider is going to be removed.'
+                remove_provider(self.driver, Settings.provider_name)
                 self.provider_exists = False
                 print 'Provider exists: ', self.provider_exists
                 time.sleep(BaseSettings.click_time_wait)
                 _search(self.driver, Settings.provider_name)
                 assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
-                    'Error: Provider with name "%s" was not deleted, it still exists' % Settings.provider_name)
-                print 'Provider was deleted successfully.'
+                    'Error: Provider with name "%s" was not removed, it still exists' % Settings.provider_name)
+                print 'Provider was removed successfully.'
             except Exception as e:
-                print 'Provider cannot be deleted. Error: "%s"' % e
+                print 'Provider cannot be removed. Error: "%s"' % e
 
         if self.project_exists:
             try:
-                # Delete project
-                print 'Project is going to be deleted.'
-                delete_project(self.driver, Settings.project_name)
+                # Remove project
+                print 'Project is going to be removed.'
+                remove_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 print 'Project exists: ', self.project_exists
                 time.sleep(BaseSettings.click_time_wait)
                 _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
-                print 'Project was deleted successfully.'
+                print 'Project was removed successfully.'
             except Exception as e:
-                print 'Project cannot be deleted. Error: "%s"' % e
+                print 'Project cannot be removed. Error: "%s"' % e
 
         if self.resource_exists:
             print 'Warning! Test cannot unlink resource "%s". It has to be unlinked manually.' % Settings.resource_name
         if self.provider_exists:
-            print 'Warning! Test cannot delete provider "%s". It has to be deleted manually.' % Settings.provider_name
+            print 'Warning! Test cannot remove provider "%s". It has to be removed manually.' % Settings.provider_name
         if self.project_exists:
-            print 'Warning! Test cannot delete project "%s". It has to be deleted manually.' % Settings.project_name
+            print 'Warning! Test cannot remove project "%s". It has to be removed manually.' % Settings.project_name
 
         self.driver.quit()
 

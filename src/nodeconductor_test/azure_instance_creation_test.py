@@ -1,12 +1,11 @@
 """
 1. Login NC
 2. Choose organization
-3. Create project
-4. Create provider
-5. Create resource
-6. Delete resource
-7. Delete provider
-8. Delete project
+3. Add project
+4. Add resource
+5. Remove resource
+6. Remove provider
+7. Remove project
 """
 
 # Test is not ready yet. It was postponed.
@@ -20,8 +19,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from helpers import (login_nodeconductor, get_driver, create_project, delete_project, choose_organization,
-                     create_resource_azure, element_exists, delete_resource, make_screenshot, get_private_parent,
+from helpers import (login_nodeconductor, get_driver, add_project, remove_project, choose_organization,
+                     add_resource_azure, element_exists, remove_resource, make_screenshot, get_private_parent,
                      _search)
 from base import BaseSettings
 
@@ -55,7 +54,7 @@ class AzureResourceCreationTest(unittest.TestCase):
         self.resource_exists = False
         self.driver.implicitly_wait(20)
 
-    def test_create_delete_resource(self):
+    def test_add_remove_resource(self):
         # Login NC
         print '%s is going to be logged in.' % Settings.username
         login_nodeconductor(self.driver, Settings.username, Settings.password)
@@ -68,26 +67,26 @@ class AzureResourceCreationTest(unittest.TestCase):
         choose_organization(self.driver, Settings.organization)
         print 'Organization was chosen successfully.'
 
-        # Create project
-        print 'Project is going to be created.'
-        create_project(self.driver, Settings.project_name)
+        # Add project
+        print 'Project is going to be added.'
+        add_project(self.driver, Settings.project_name)
         time.sleep(BaseSettings.click_time_wait)
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create project "%s"' % Settings.project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % Settings.project_name
         self.project_exists = True
         print 'Project exists: ', self.project_exists
-        print 'Project was created successfully.'
+        print 'Project was added successfully.'
 
-        # Create resource
-        print 'Resource is going to be created.'
-        create_resource_azure(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
-                              Settings.provider_name, Settings.image_name, Settings.username, Settings.azure_os_password,
-                              Settings.size_name)
+        # Add resource
+        print 'Resource is going to be added.'
+        add_resource_azure(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
+                           Settings.provider_name, Settings.image_name, Settings.username, Settings.azure_os_password,
+                           Settings.size_name)
         xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.resource_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot create resource "%s"' % Settings.resource_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add resource "%s"' % Settings.resource_name
         self.resource_exists = True
         print 'Resource exists: ', self.resource_exists
-        print 'Find online state of created resource'
+        print 'Find online state of added resource'
         try:
             WebDriverWait(self.driver, Settings.time_after_resource_creation).until(
                 EC.presence_of_element_located((By.XPATH, '//div[contains(text(), "Online")]')))
@@ -96,15 +95,15 @@ class AzureResourceCreationTest(unittest.TestCase):
             raise e
         else:
             print 'Resource is in online state'
-        print 'Resource was created successfully.'
+        print 'Resource was added successfully.'
 
         # Method is not ready. Cannot check as resource cannot be purchased now
-        # Delete resource
-        print 'Resource is going to be deleted.'
-        delete_resource(self.driver, Settings.resource_name, Settings.project_name,
+        # Remove resource
+        print 'Resource is going to be removed.'
+        remove_resource(self.driver, Settings.resource_name, Settings.project_name,
                         Settings.time_wait_after_resource_stopping, Settings.time_wait_after_resource_removal)
         self.resource_exists = False
-        print 'Resource was deleted successfully'
+        print 'Resource was removed successfully'
         time.sleep(10)
 
     def tearDown(self):
@@ -113,23 +112,23 @@ class AzureResourceCreationTest(unittest.TestCase):
             make_screenshot(self.driver, name=self.__class__.__name__)
         if self.project_exists:
             try:
-                # Delete project
-                print 'Project is going to be deleted.'
-                delete_project(self.driver, Settings.project_name)
+                # Remove project
+                print 'Project is going to be removed.'
+                remove_project(self.driver, Settings.project_name)
                 self.project_exists = False
                 time.sleep(BaseSettings.click_time_wait)
                 _search(self.driver, Settings.project_name)
                 if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
                     self.project_exists = True
                     print 'Project exists: ', self.project_exists
-                print 'Project was deleted successfully.'
+                print 'Project was removed successfully.'
             except Exception as e:
-                print 'Project cannot be deleted. Error: "%s"' % e
+                print 'Project cannot be removed. Error: "%s"' % e
 
         if self.resource_exists:
-            print 'Warning! Test cannot delete resource %s. It has to be deleted manually.' % Settings.resource_name
+            print 'Warning! Test cannot remove resource %s. It has to be removed manually.' % Settings.resource_name
         if self.project_exists:
-            print 'Warning! Test cannot delete project %s. It has to be deleted manually.' % Settings.project_name
+            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % Settings.project_name
 
         self.driver.quit()
 
