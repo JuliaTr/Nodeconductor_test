@@ -44,6 +44,7 @@ class OrganizationBalanceTest(unittest.TestCase):
         self.driver = get_driver(Settings.site_url)
         self.organization_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
+        self.organization = Settings.get_unique_attribute('organization')
 
     def test_organization_balance(self):
         # Login NC
@@ -56,10 +57,10 @@ class OrganizationBalanceTest(unittest.TestCase):
         # Add organization
         print 'Organization is going to be added.'
         time.sleep(BaseSettings.click_time_wait)
-        add_organization(self.driver, Settings.organization)
+        add_organization(self.driver, self.organization)
         print 'Existence check of added organization'
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.organization
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add organization "%s"' % Settings.organization
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.organization
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add organization "%s"' % self.organization
         self.organization_exists = True
         print 'Organization exists: ', self.organization_exists
         print 'Organization was added successfully.'
@@ -67,7 +68,7 @@ class OrganizationBalanceTest(unittest.TestCase):
         # Choose organization
         print 'Organization is going to be chosen.'
         go_to_main_page(self.driver)
-        choose_organization(self.driver, Settings.organization)
+        choose_organization(self.driver, self.organization)
         print 'Organization was chosen successfully.'
 
         # Top-up balance
@@ -96,7 +97,7 @@ class OrganizationBalanceTest(unittest.TestCase):
             try:
                 # Remove organization
                 print 'Organization is going to be removed.'
-                remove_organization(self.driver, Settings.organization)
+                remove_organization(self.driver, self.organization)
                 self.organization_exists = False
                 print 'Organization exists: ', self.organization_exists
                 print 'Wait till go back to list option will be possible'
@@ -104,15 +105,15 @@ class OrganizationBalanceTest(unittest.TestCase):
                     EC.element_to_be_clickable((By.CLASS_NAME, 'back-to-list')))
                 _back_to_list(self.driver)
                 print 'Existence check of removed organization'
-                _search(self.driver, Settings.organization, css_selector='[ng-model="entityList.searchInput"]')
-                assert not element_exists(self.driver, link_text=Settings.organization), (
-                    'Error: Organization with name "%s" was not removed, it still exists' % Settings.organization)
+                _search(self.driver, self.organization, css_selector='[ng-model="entityList.searchInput"]')
+                assert not element_exists(self.driver, link_text=self.organization), (
+                    'Error: Organization with name "%s" was not removed, it still exists' % self.organization)
                 print 'Organization was removed successfully.'
             except Exception as e:
                 print 'Organization cannot be removed. Error: "%s"' % e
 
         if self.organization_exists:
-            print 'Warning! Test cannot remove organization "%s". It has to be removed manually.' % Settings.organization
+            print 'Warning! Test cannot remove organization "%s". It has to be removed manually.' % self.organization
 
         self.driver.quit()
 
