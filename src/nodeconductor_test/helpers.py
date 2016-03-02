@@ -242,10 +242,12 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account,
     add_amount_field = driver.find_element_by_css_selector('[ng-model="amount"]')
     add_amount_field.clear()
     add_amount_field.send_keys(top_up_balance)
+    time.sleep(10)  # sometimes doesn't work without this timeout
     add_credit_button = driver.find_element_by_css_selector('[submit-button="addCredit(amount)"]')
     add_credit_button.click()
     print 'Switch to payment process'
-    # TODO: Add explicit time wait till elements will be loaded.
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'header')))
     print 'Page URL: %s ' % driver.current_url
     WebDriverWait(driver, time_wait_to_swich_to_paypal).until(
         EC.presence_of_element_located((By.ID, 'loadLogin')))

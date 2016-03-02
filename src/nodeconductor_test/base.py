@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -15,3 +16,7 @@ class BaseSettings(object):
     implicitly_wait = 30  # time to wait for element appears on the page
     screenshots_folder = os.path.join(project_path, 'screenshots')
     test_reports_dir = os.path.join(project_path, 'test_reports')  # unittest-xml-reporting must be installed
+
+    @classmethod
+    def get_unique_attribute(cls, attr):
+        return '%s %s' % (getattr(cls, attr), uuid4().hex)
