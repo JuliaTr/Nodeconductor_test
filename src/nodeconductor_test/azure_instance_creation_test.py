@@ -99,40 +99,40 @@ class AzureResourceCreationTest(unittest.TestCase):
             print 'Resource is in online state'
         print 'Resource was added successfully.'
 
-        # # Method is not ready. Cannot check as resource cannot be purchased now
-        # # Remove resource
-        # print 'Resource is going to be removed.'
-        # remove_resource(self.driver, self.resource_name, self.project_name,
-        #                 Settings.time_wait_after_resource_stopping, Settings.time_wait_after_resource_removal)
-        # self.resource_exists = False
-        # print 'Resource was removed successfully'
-        # time.sleep(10)
+        # Method is not ready. Cannot check as resource cannot be purchased now
+        # Remove resource
+        print 'Resource is going to be removed.'
+        remove_resource(self.driver, self.resource_name, self.project_name,
+                        Settings.time_wait_after_resource_stopping, Settings.time_wait_after_resource_removal)
+        self.resource_exists = False
+        print 'Resource was removed successfully'
+        time.sleep(10)
 
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver, name=self.__class__.__name__)
-        # if self.project_exists:
-        #     try:
-        #         # Remove project
-        #         print 'Project is going to be removed.'
-        #         remove_project(self.driver, self.project_name)
-        #         self.project_exists = False
-        #         time.sleep(BaseSettings.click_time_wait)
-        #         _search(self.driver, self.project_name)
-        #         if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % self.project_name):
-        #             self.project_exists = True
-        #             print 'Project exists: ', self.project_exists
-        #         print 'Project was removed successfully.'
-        #     except Exception as e:
-        #         print 'Project cannot be removed. Error: "%s"' % e
+        if self.project_exists:
+            try:
+                # Remove project
+                print 'Project is going to be removed.'
+                remove_project(self.driver, self.project_name)
+                self.project_exists = False
+                time.sleep(BaseSettings.click_time_wait)
+                _search(self.driver, self.project_name)
+                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % self.project_name):
+                    self.project_exists = True
+                    print 'Project exists: ', self.project_exists
+                print 'Project was removed successfully.'
+            except Exception as e:
+                print 'Project cannot be removed. Error: "%s"' % e
 
-        # if self.resource_exists:
-        #     print 'Warning! Test cannot remove resource %s. It has to be removed manually.' % self.resource_name
-        # if self.project_exists:
-        #     print 'Warning! Test cannot remove project %s. It has to be removed manually.' % self.project_name
+        if self.resource_exists:
+            print 'Warning! Test cannot remove resource %s. It has to be removed manually.' % self.resource_name
+        if self.project_exists:
+            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % self.project_name
 
-        # self.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":
