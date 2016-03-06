@@ -36,7 +36,7 @@ class Settings(BaseSettings, private_parent):
     organization = 'Test only org'
     project_name = 'Amazon test project'
     provider_type_name = 'Amazon'
-    provider_name = 'AmazonTest provider'
+    provider_name = 'AWS test provider'
     category_name = 'VMs'
     resource_name = 'docker-build-host'
     resource_cost = '$53.59'
@@ -53,6 +53,8 @@ class AWSResourceImportTest(unittest.TestCase):
         self.provider_exists = False
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
+        self.project_name = Settings.get_unique_attribute('project_name')
+        self.provider_name = Settings.get_unique_attribute('provider_name')
 
     def test_import_unlink_resource(self):
         # Login NC
@@ -69,10 +71,10 @@ class AWSResourceImportTest(unittest.TestCase):
 
         # Add project
         print 'Project is going to be added.'
-        add_project(self.driver, Settings.project_name)
+        add_project(self.driver, self.project_name)
         time.sleep(BaseSettings.click_time_wait)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % Settings.project_name
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % self.project_name
         self.project_exists = True
         print 'Project exists: ', self.project_exists
         print 'Project was added successfully.'
@@ -81,13 +83,13 @@ class AWSResourceImportTest(unittest.TestCase):
         # Add provider
         print 'Provider is going to be added.'
         time.sleep(BaseSettings.click_time_wait)
-        add_provider_aws(self.driver, Settings.provider_name, Settings.provider_type_name,
+        add_provider_aws(self.driver, self.provider_name, Settings.provider_type_name,
                          Settings.aws_access_key_id, Settings.aws_secret_access_key)
         print 'Search added provider'
-        _search(self.driver, Settings.provider_name)
+        _search(self.driver, self.provider_name)
         print 'Find provider in list'
-        xpath = '//span[contains(text(), "%s")]' % Settings.provider_name
-        assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % Settings.provider_name
+        xpath = '//span[contains(text(), "%s")]' % self.provider_name
+        assert element_exists(self.driver, xpath=xpath), 'Error: Provider with name "%s" is not found' % self.provider_name
         self.provider_exists = True
         print 'Provider exists: ', self.provider_exists
         print 'Find online state of added provider'
@@ -103,7 +105,7 @@ class AWSResourceImportTest(unittest.TestCase):
 
         # Import resource
         print 'Resource is going to be imported.'
-        imported = import_resource(self.driver, Settings.project_name, Settings.provider_name, Settings.category_name,
+        imported = import_resource(self.driver, self.project_name, self.provider_name, Settings.category_name,
                                    Settings.resource_name, Settings.time_wait_available_resource_for_import)
         if not imported:
             return
@@ -123,30 +125,31 @@ class AWSResourceImportTest(unittest.TestCase):
         print 'Imported resource is in online or offline state'
         print 'Resource was imported successfully.'
 
-        print '----- Cost is going to be checked----- '
-        go_to_main_page(self.driver)
-        costs = self.driver.find_element_by_link_text('Costs')
-        costs.click()
-        time.sleep(BaseSettings.click_time_wait)
-        print 'Select resources tab'
-        resources_list = self.driver.find_element_by_css_selector('[ng-class="{\'active\': row.selected && row.activeTab==\'resources\'}"]')
-        resources_list.click()
-        time.sleep(BaseSettings.click_time_wait)
-        print 'Find row with the resource in a resource table'
-        rows_list = self.driver.find_elements_by_css_selector('[ng-repeat="resource in row.resources"]')
-        resource_cost_exists = False
-        for row in rows_list:
-            if Settings.resource_name in row.text:
-                assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" ' % Settings.resource_cost
-                resource_cost_exists = True
-                print 'Resource cost "%s" was found on page' % Settings.resource_cost
-        assert resource_cost_exists, 'Error: Cannot find resource with name "%s" to check cost' % Settings.resource_name
-        time.sleep(BaseSettings.click_time_wait)
-        print '----- Cost was checked successfully----- '
+        # Blocker SAAS-1204
+        # print '----- Cost is going to be checked----- '
+        # go_to_main_page(self.driver)
+        # costs = self.driver.find_element_by_link_text('Costs')
+        # costs.click()
+        # time.sleep(BaseSettings.click_time_wait)
+        # print 'Select resources tab'
+        # resources_list = self.driver.find_element_by_css_selector('[ng-class="{\'active\': row.selected && row.activeTab==\'resources\'}"]')
+        # resources_list.click()
+        # time.sleep(BaseSettings.click_time_wait)
+        # print 'Find row with the resource in a resource table'
+        # rows_list = self.driver.find_elements_by_css_selector('[ng-repeat="resource in row.resources"]')
+        # resource_cost_exists = False
+        # for row in rows_list:
+        #     if Settings.resource_name in row.text:
+        #         assert Settings.resource_cost in row.text, 'Error: Cannot find resource cost "%s" ' % Settings.resource_cost
+        #         resource_cost_exists = True
+        #         print 'Resource cost "%s" was found on page' % Settings.resource_cost
+        # assert resource_cost_exists, 'Error: Cannot find resource with name "%s" to check cost' % Settings.resource_name
+        # time.sleep(BaseSettings.click_time_wait)
+        # print '----- Cost was checked successfully----- '
 
         # Unlink resource
         print 'Resource is going to be unlinked.'
-        unlink_resource(self.driver, Settings.project_name, Settings.resource_name)
+        unlink_resource(self.driver, self.project_name, Settings.resource_name)
         _search(self.driver, Settings.resource_name)
         print 'Check unlinked resource existence'
         assert not element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.resource_name), (
@@ -164,13 +167,13 @@ class AWSResourceImportTest(unittest.TestCase):
             try:
                 # Remove provider
                 print 'Provider is going to be removed.'
-                remove_provider(self.driver, Settings.provider_name)
+                remove_provider(self.driver, self.provider_name)
                 self.provider_exists = False
                 print 'Provider exists: ', self.provider_exists
                 time.sleep(BaseSettings.click_time_wait)
-                _search(self.driver, Settings.provider_name)
-                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.provider_name), (
-                    'Error: Provider with name "%s" was not removed, it still exists' % Settings.provider_name)
+                _search(self.driver, self.provider_name)
+                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % self.provider_name), (
+                    'Error: Provider with name "%s" was not removed, it still exists' % self.provider_name)
                 print 'Provider was removed successfully.'
             except Exception as e:
                 print 'Provider cannot be removed. Error: "%s"' % e
@@ -179,12 +182,12 @@ class AWSResourceImportTest(unittest.TestCase):
             try:
                 # Remove project
                 print 'Project is going to be removed.'
-                remove_project(self.driver, Settings.project_name)
+                remove_project(self.driver, self.project_name)
                 self.project_exists = False
                 print 'Project exists: ', self.project_exists
                 time.sleep(BaseSettings.click_time_wait)
-                _search(self.driver, Settings.project_name)
-                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
+                _search(self.driver, self.project_name)
+                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % self.project_name):
                     self.project_exists = True
                 print 'Project was removed successfully.'
             except Exception as e:
@@ -193,9 +196,9 @@ class AWSResourceImportTest(unittest.TestCase):
         if self.resource_exists:
             print 'Warning! Test cannot unlink resource "%s". It has to be unlinked manually.' % Settings.resource_name
         if self.provider_exists:
-            print 'Warning! Test cannot remove provider "%s". It has to be removed manually.' % Settings.provider_name
+            print 'Warning! Test cannot remove provider "%s". It has to be removed manually.' % self.provider_name
         if self.project_exists:
-            print 'Warning! Test cannot remove project "%s". It has to be removed manually.' % Settings.project_name
+            print 'Warning! Test cannot remove project "%s". It has to be removed manually.' % self.project_name
 
         self.driver.quit()
 

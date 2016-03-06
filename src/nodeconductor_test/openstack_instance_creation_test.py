@@ -32,13 +32,13 @@ class Settings(BaseSettings):
     password = 'Alice'
     user_full_name = 'Alice Lebowski'
     organization = 'Test only org'
-    project_name = 'OpenStack test project1'
+    project_name = 'OpenStack test project'
     key_name = 'Openstack test key'
     category_name = 'VMs'
     provider_name_in_resource = 'Parnu lab'
     image_name = 'Ubuntu 14.04 x86_64'
     flavor_name = 'm1.small'
-    resource_name = 'OpenStack test instance1'
+    resource_name = 'OpenStack test instance'
     public_key_name = 'Openstack test key'
     time_wait_for_resource_creation = 240
     time_wait_after_resource_stopping = 180
@@ -54,6 +54,9 @@ class OpenStackCreationTest(unittest.TestCase):
         self.ssh_key_exists = False
         self.resource_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
+        self.project_name = Settings.get_unique_attribute('project_name')
+        self.key_name = Settings.get_unique_attribute('key_name')
+        self.resource_name = Settings.get_unique_attribute('resource_name')
 
     def test_add_remove_resource(self):
         # Login NC
@@ -70,10 +73,10 @@ class OpenStackCreationTest(unittest.TestCase):
 
         # Add project
         print 'Project is going to be added.'
-        add_project(self.driver, Settings.project_name)
+        add_project(self.driver, self.project_name)
         time.sleep(BaseSettings.click_time_wait)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % Settings.project_name
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % self.project_name
         self.project_exists = True
         print 'Project exists: ', self.project_exists
         print 'Project was added successfully.'
@@ -81,23 +84,23 @@ class OpenStackCreationTest(unittest.TestCase):
         # Add ssh key
         print 'SSH key is going to be added.'
         time.sleep(BaseSettings.click_time_wait)
-        add_ssh_key(self.driver, Settings.user_full_name, Settings.key_name)
-        _search(self.driver, Settings.key_name)
+        add_ssh_key(self.driver, Settings.user_full_name, self.key_name)
+        _search(self.driver, self.key_name)
         print 'Find key in list'
-        xpath = '//span[contains(text(), "%s")]' % Settings.key_name
-        assert element_exists(self.driver, xpath=xpath), 'Error: Key with name "%s" is not found' % Settings.key_name
+        xpath = '//span[contains(text(), "%s")]' % self.key_name
+        assert element_exists(self.driver, xpath=xpath), 'Error: Key with name "%s" is not found' % self.key_name
         self.ssh_key_exists = True
         print 'SSH key exists: ', self.ssh_key_exists
         print 'SSH key was added successfully'
 
-        # Blocker SAAS-1141
+        # Blocker SAAS-1207
         # Add resource
         print 'Resource is going to be added.'
-        add_resource_openstack(self.driver, Settings.project_name, Settings.resource_name, Settings.category_name,
+        add_resource_openstack(self.driver, self.project_name, self.resource_name, Settings.category_name,
                                Settings.provider_name_in_resource, Settings.image_name, Settings.flavor_name,
                                Settings.public_key_name)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.resource_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add resource "%s"' % Settings.resource_name
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.resource_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add resource "%s"' % self.resource_name
         self.resource_exists = True
         print 'Resource exists: ', self.resource_exists
         print 'Find online state of added resource'
@@ -111,22 +114,22 @@ class OpenStackCreationTest(unittest.TestCase):
             print 'Resource is in online state'
         print 'Resource was added successfully.'
 
-        # SAAS-1133
+        # Blocker SAAS-1209
         # Remove resource
         print 'Resource is going to be removed.'
-        remove_resource(self.driver, Settings.resource_name, Settings.project_name,
+        remove_resource(self.driver, self.resource_name, self.project_name,
                         Settings.time_wait_after_resource_stopping)
         self.resource_exists = False
         print 'Resource exists: ', self.resource_exists
-        # _search(self.driver, Settings.resource_name)
-        # print 'Wait till resource will be removed'
-        # try:
-        #     WebDriverWait(self.driver, Settings.time_wait_after_resource_removal).until(
-        #         EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % Settings.resource_name)))
-        # except TimeoutException as e:
-        #     print 'Error: Resource with name "%s" was not removed, it still exists' % Settings.resource_name
-        #     raise e
-        # print 'Resource was removed successfully.'
+        _search(self.driver, self.resource_name)
+        print 'Wait till resource will be removed'
+        try:
+            WebDriverWait(self.driver, Settings.time_wait_after_resource_removal).until(
+                EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % self.resource_name)))
+        except TimeoutException as e:
+            print 'Error: Resource with name "%s" was not removed, it still exists' % self.resource_name
+            raise e
+        print 'Resource was removed successfully.'
 
     def tearDown(self):
         print '\n\n\n --- TEARDOWN ---'
@@ -136,12 +139,12 @@ class OpenStackCreationTest(unittest.TestCase):
             try:
                 # Remove project
                 print 'Project is going to be removed.'
-                remove_project(self.driver, Settings.project_name)
+                remove_project(self.driver, self.project_name)
                 self.project_exists = False
                 print 'Project exists: ', self.project_exists
                 time.sleep(BaseSettings.click_time_wait)
-                _search(self.driver, Settings.project_name)
-                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
+                _search(self.driver, self.project_name)
+                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % self.project_name):
                     self.project_exists = True
                     print 'Project exists: ', self.project_exists
                 print 'Project was removed successfully.'
@@ -152,22 +155,22 @@ class OpenStackCreationTest(unittest.TestCase):
             try:
                 # Remove ssh key
                 print 'Ssh key is going to be removed.'
-                remove_ssh_key(self.driver, Settings.key_name, Settings.user_full_name)
+                remove_ssh_key(self.driver, self.key_name, Settings.user_full_name)
                 self.ssh_key_exists = False
                 print 'SSH key exists: ', self.ssh_key_exists
-                _search(self.driver, Settings.key_name)
-                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % Settings.key_name), (
-                    'Error: SSH key with name "%s" was not removed, it still exists' % Settings.key_name)
+                _search(self.driver, self.key_name)
+                assert not element_exists(self.driver, xpath='//span[contains(text(), "%s")]' % self.key_name), (
+                    'Error: SSH key with name "%s" was not removed, it still exists' % self.key_name)
                 print 'SSH key was removed successfully.'
             except Exception as e:
                 print 'SSH key cannot be removed. Error: %s' % e
 
         if self.resource_exists:
-            print 'Warning! Test cannot remove resource %s. It has to be removed manually.' % Settings.resource_name
+            print 'Warning! Test cannot remove resource %s. It has to be removed manually.' % self.resource_name
         if self.project_exists:
-            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % Settings.project_name
+            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % self.project_name
         if self.ssh_key_exists:
-            print 'Warning! Test cannot remove ssh key %s. It has to be deleted manually.' % Settings.key_name
+            print 'Warning! Test cannot remove ssh key %s. It has to be deleted manually.' % self.key_name
 
         self.driver.quit()
 

@@ -52,6 +52,11 @@ class ApplicationCreationTest(unittest.TestCase):
         self.application_group_exists = False
         self.application_project_exists = False
         self.driver.implicitly_wait(BaseSettings.implicitly_wait)
+        self.project_name = Settings.get_unique_attribute('project_name')
+        self.application_group_name = Settings.get_unique_attribute('application_group_name')
+        self.application_project_name = Settings.get_unique_attribute('application_project_name')
+        # TODO Add uuid for a path after SAAS-1185
+        # self.path_name = Settings.get_unique_attribute('path_name')
 
     def test_add_remove_application(self):
         # Login NC
@@ -68,21 +73,20 @@ class ApplicationCreationTest(unittest.TestCase):
 
         # Add project
         print 'Project is going to be added.'
-        add_project(self.driver, Settings.project_name)
+        add_project(self.driver, self.project_name)
         time.sleep(BaseSettings.click_time_wait)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % Settings.project_name
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add project "%s"' % self.project_name
         self.project_exists = True
         print 'Project exists: ', self.project_exists
         print 'Project was added successfully.'
 
-        # Blocker SAAS-1145
         # Add application group
         print 'Application group is going to be added.'
-        add_application_group(self.driver, Settings.project_name, Settings.category_name, Settings.resource_type_name,
-                              Settings.path_name, Settings.application_group_name)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.application_group_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add application group "%s"' % Settings.application_group_name
+        add_application_group(self.driver, self.project_name, Settings.category_name, Settings.resource_type_name,
+                              Settings.path_name, self.application_group_name)
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.application_group_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add application group "%s"' % self.application_group_name
         self.application_group_exists = True
         print 'Application group exists: ', self.application_group_exists
         print 'Find online state of added application group'
@@ -98,10 +102,10 @@ class ApplicationCreationTest(unittest.TestCase):
 
         # Add application project
         print 'Application project is going to be added.'
-        add_application_project(self.driver, Settings.project_name, Settings.category_name, Settings.resource_type_name1, Settings.application_project_name,
-                                Settings.visibility_level_name, Settings.application_group_name)
-        xpath = '//span[@class="name" and contains(text(), "%s")]' % Settings.application_project_name
-        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add application group "%s"' % Settings.application_project_name
+        add_application_project(self.driver, self.project_name, Settings.category_name, Settings.resource_type_name1, self.application_project_name,
+                                Settings.visibility_level_name, self.application_group_name)
+        xpath = '//span[@class="name" and contains(text(), "%s")]' % self.application_project_name
+        assert bool(self.driver.find_elements_by_xpath(xpath)), 'Cannot add application group "%s"' % self.application_project_name
         self.application_project_exists = True
         print 'Application project exists: ', self.application_project_exists
         print 'Find online state of added application group'
@@ -119,21 +123,20 @@ class ApplicationCreationTest(unittest.TestCase):
         print '\n\n\n --- TEARDOWN ---'
         if sys.exc_info()[0] is not None:
             make_screenshot(self.driver, name=self.__class__.__name__)
-        print 'Organization exists: ', self.organization_exists
         if self.application_project_exists:
             try:
                 # Remove application project
                 print 'Application project is going to be removed.'
-                remove_application_project(self.driver, Settings.project_name, Settings.application_project_name)
+                remove_application_project(self.driver, self.project_name, self.application_project_name)
                 self.application_project_exists = False
                 print 'Application project exists: ', self.application_project_exists
-                _search(self.driver, Settings.application_project_name)
+                _search(self.driver, self.application_project_name)
                 print 'Wait till application project will be removed'
                 try:
                     WebDriverWait(self.driver, Settings.time_wait_to_remove_application).until(
-                        EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % Settings.application_project_name)))
+                        EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % self.application_project_name)))
                 except TimeoutException as e:
-                    print 'Error: Application project with name "%s" was not removed, it still exists' % Settings.application_project_name
+                    print 'Error: Application project with name "%s" was not removed, it still exists' % self.application_project_name
                     raise e
                 else:
                     print 'Application project was removed successfully.'
@@ -144,16 +147,16 @@ class ApplicationCreationTest(unittest.TestCase):
             try:
                 # Remove application group
                 print 'Application group is going to be removed.'
-                remove_application_group(self.driver, Settings.project_name, Settings.application_group_name)
+                remove_application_group(self.driver, self.project_name, self.application_group_name)
                 self.application_group_exists = False
                 print 'Application group exists: ', self.application_group_exists
-                _search(self.driver, Settings.application_group_name)
+                _search(self.driver, self.application_group_name)
                 print 'Wait till application group will be removed'
                 try:
                     WebDriverWait(self.driver, Settings.time_wait_to_remove_application).until(
-                        EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % Settings.application_group_name)))
+                        EC.invisibility_of_element_located((By.XPATH, '//a[contains(text(), "%s")]' % self.application_group_name)))
                 except TimeoutException as e:
-                    print 'Error: Application group with name "%s" was not removed, it still exists' % Settings.application_group_name
+                    print 'Error: Application group with name "%s" was not removed, it still exists' % self.application_group_name
                     raise e
                 else:
                     print 'Application group was removed successfully.'
@@ -164,23 +167,23 @@ class ApplicationCreationTest(unittest.TestCase):
             try:
                 # Remove project
                 print 'Project is going to be removed.'
-                remove_project(self.driver, Settings.project_name)
+                remove_project(self.driver, self.project_name)
                 self.project_exists = False
                 print 'Project exists: ', self.project_exists
                 time.sleep(BaseSettings.click_time_wait)
-                _search(self.driver, Settings.project_name)
-                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % Settings.project_name):
+                _search(self.driver, self.project_name)
+                if element_exists(self.driver, xpath='//a[contains(text(), "%s")]' % self.project_name):
                     self.project_exists = True
                 print 'Project was removed successfully.'
             except Exception as e:
                 print 'Project cannot be removed. Error: "%s"' % e
 
         if self.application_project_exists:
-            print 'Warning! Test cannot remove application project %s. It has to be removed manually.' % Settings.application_project_name
+            print 'Warning! Test cannot remove application project %s. It has to be removed manually.' % self.application_project_name
         if self.application_group_exists:
-            print 'Warning! Test cannot remove application group %s. It has to be removed manually.' % Settings.application_group_name
+            print 'Warning! Test cannot remove application group %s. It has to be removed manually.' % self.application_group_name
         if self.project_exists:
-            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % Settings.project_name
+            print 'Warning! Test cannot remove project %s. It has to be removed manually.' % self.project_name
 
         self.driver.quit()
 

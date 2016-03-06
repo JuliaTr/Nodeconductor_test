@@ -248,7 +248,7 @@ def top_up_organization_balance(driver, top_up_balance, email, password_account,
     print 'Switch to payment process'
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, 'header')))
-    print 'Page URL: %s ' % driver.current_url
+    print 'Page URL: %s ' % driver.current_url  # SAAS-1206
     WebDriverWait(driver, time_wait_to_swich_to_paypal).until(
         EC.presence_of_element_located((By.ID, 'loadLogin')))
     way_to_pay = driver.find_element_by_id('loadLogin')
@@ -310,6 +310,7 @@ def add_ssh_key(driver, user_full_name, key_name):
     profile.click()
     _go_to_tab(driver, css_selector='[visible="keys"]')
     print 'Push button to add SSH key'
+    # Sometimes test fails here
     keys_field = driver.find_element_by_link_text('Add SSH Key')
     keys_field.click()
     time.sleep(BaseSettings.click_time_wait)
@@ -330,7 +331,7 @@ def add_ssh_key(driver, user_full_name, key_name):
     print '----- SSH key creation process ended -----'
 
 
-def H_ssh_key(driver, key_name, user_full_name):
+def remove_ssh_key(driver, key_name, user_full_name):
     print '----- SSH key deletion process started -----'
     print 'Go to profile page'
     user_field = driver.find_element_by_class_name('user-name')
@@ -346,9 +347,9 @@ def H_ssh_key(driver, key_name, user_full_name):
     print '----- SSH key deletion process ended -----'
 
 
-# Blocker SAAS-1141
+# Blocker SAAS-1207
 def add_resource_openstack(driver, project_name, resource_name, category_name, provider_name_in_resource,
-                              image_name, flavor_name, public_key_name):
+                           image_name, flavor_name, public_key_name):
     print '----- Resource creation process started -----'
     go_to_main_page(driver)
     _go_to_project_page(driver, project_name)
@@ -442,6 +443,7 @@ def add_resource_azure(driver, project_name, resource_name, category_name, provi
     print '----- Resource creation process ended -----'
 
 
+# Blocker SAAS-1209
 def remove_resource(driver, resource_name, project_name, time_wait_after_resource_stopping):
     print '----- Resource deletion process started -----'
     go_to_main_page(driver)
@@ -623,9 +625,11 @@ def remove_provider(driver, provider_name):
 def add_application_group(driver, project_name, category_name, resource_type_name, path_name, application_group_name):
     print '----- Application group creation process started -----'
     go_to_main_page(driver)
+    # Sometimes test fails here
+    time.sleep(15)
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
-    time.sleep(5)  # add button isn't selected without additional time wait
+    time.sleep(15)  # add button isn't selected without additional time wait
     _add_button(driver, application_group_name)
     print 'Category selection'
     categories = driver.find_elements_by_class_name('appstore-template')
@@ -650,9 +654,10 @@ def add_application_group(driver, project_name, category_name, resource_type_nam
 
 
 def add_application_project(driver, project_name, category_name, resource_type_name1,
-                               application_project_name, visibility_level_name, application_group_name):
+                            application_project_name, visibility_level_name, application_group_name):
     print '----- Application project creation process started -----'
     go_to_main_page(driver)
+    # Sometimes test fails here
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
     _add_button(driver, application_project_name)
@@ -691,6 +696,7 @@ def add_application_project(driver, project_name, category_name, resource_type_n
 def remove_application_group(driver, project_name, application_group_name):
     print '----- Application group deletion process started -----'
     go_to_main_page(driver)
+    time.sleep(10)  # Sometimes test fails here
     _go_to_project_page(driver, project_name)
     _go_to_tab(driver, css_selector='[visible="applications"]')
     _search(driver, application_group_name)
